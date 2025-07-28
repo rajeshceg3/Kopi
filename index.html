@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kopī (Secured)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg-color: #f5f5f7;
+            --font-color: #8a8a8e;
+            --border-color: #e0e0e2;
+            --shadow-color: rgba(0, 0, 0, 0.05);
+            --shape-blue: #8ab4f8;
+            --shape-pink: #f88ab4;
+            --shape-green: #8af8c4;
+            --shape-yellow: #f8d48a;
+            --target-outline-color: #d1d1d6;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--font-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; user-select: none; cursor: default; }
+        .game-world { width: 100%; max-width: 500px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .game-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 20px; }
+        .game-title { font-size: 24px; font-weight: 400; color: #1d1d1f; }
+        .level-indicator { font-size: 16px; font-weight: 300; }
+        .game-container { width: 100%; position: relative; }
+        .canvas { width: 100%; padding-bottom: 100%; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; box-shadow: 0 4px 15px var(--shadow-color); position: relative; overflow: hidden; cursor: none; }
+        .palette { margin-top: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; min-height: 80px; }
+        
+        /* [BUG-003] Use button for accessibility */
+        .palette-button { background: none; border: none; padding: 0; cursor: pointer; }
+        .palette-button:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; border-radius: inherit; } /* Improve focus visibility */
+        .palette-button .shape { transition: transform 0.2s ease-out, opacity 0.3s ease; }
+        .palette-button:hover .shape { transform: scale(1.1); }
+
+        .shape { width: 60px; height: 60px; }
+        .target-shape { position: absolute; border: 2px dashed var(--target-outline-color); transition: opacity 0.5s ease; }
+        .placed-shape { position: absolute; border: none; animation: place-anim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes place-anim { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        
+        .shape-blue { background-color: var(--shape-blue); }
+        .shape-pink { background-color: var(--shape-pink); }
+        .shape-green { background-color: var(--shape-green); }
+        .shape-yellow { background-color: var(--shape-yellow); }
+
+        .shape-circle { border-radius: 50%; }
+        .shape-triangle { background-color: transparent !important; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; }
+        .shape-triangle.shape-blue { border-bottom: 60px solid var(--shape-blue); }
+        .shape-triangle.shape-pink { border-bottom: 60px solid var(--shape-pink); }
+        .shape-triangle.shape-green { border-bottom: 60px solid var(--shape-green); }
+        .shape-triangle.shape-yellow { border-bottom: 60px solid var(--shape-yellow); }
+        
+        .cursor-ghost { position: fixed; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; z-index: 100; transform: translate(-50%, -50%); }
+        body.ghost-active .cursor-ghost { opacity: 0.8; }
+        
+        .completion-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(245, 245, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        .completion-message.show { opacity: 1; pointer-events: all; }
+        .completion-message p { font-size: 36px; font-weight: 300; color: #1d1d1f; animation: fade-in-up 0.6s ease-out forwards; }
+        #next-level-button { margin-top: 20px; padding: 10px 25px; font-size: 16px; font-weight: 400; color: #fff; background-color: #007aff; border: none; border-radius: 30px; cursor: pointer; transition: background-color 0.2s ease, opacity 0.2s ease; animation: fade-in-up 0.6s 0.2s ease-out forwards; opacity: 0; }
+        #next-level-button:hover { background-color: #005ecb; }
+        #next-level-button:disabled { background-color: #8a8a8e; cursor: not-allowed; } /* [BUG-002] Disabled state */
+        @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <main class="game-world" role="application">
+        <header class="game-header">
+            <h1 class="game-title">Kopī</h1>
+            <div id="level-indicator" class="level-indicator">Level 1</div>
+        </header>
+        <div id="game-container" class="game-container">
+            <div id="canvas" class="canvas"></div>
+            <div id="palette" class="palette"></div>
+        </div>
+        <div id="completion-message" class="completion-message">
+            <p>Complete</p>
+            <button id="next-level-button">Next</button>
+        </div>
+        <div id="cursor-ghost" class="cursor-ghost"></div>
+    </main>
+
+    <script>
+        // [BUG-001] Encapsulate entire script in an IIFE to prevent global scope pollution.
+        (() => {
+            document.addEventListener('DOMContentLoaded', () => {
+                const canvas = document.getElementById('canvas');
+                const palette = document.getElementById('palette');
+                const levelIndicator = document.getElementById('level-indicator');
+                const completionMessage = document.getElementById('completion-message');
+                const nextLevelButton = document.getElementById('next-level-button');
+                const cursorGhost = document.getElementById('cursor-ghost');
+
+                let currentLevel = 0;
+                let selectedShape = null;
+                let placedShapes = 0;
+                let isTransitioning = false; // [BUG-002] State flag for level transitions.
+
+                const levels = [ /* Level data remains the same */ { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] }, { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] }, { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }];
+
+                function getShapeClass(shape) { return `shape-${shape.type} shape-${shape.color}`; }
+
+                function loadLevel(levelIndex) {
+                    if (isTransitioning) return; // [BUG-002] Prevent concurrent loading.
+                    isTransitioning = true;
+                    
+                    canvas.innerHTML = '';
+                    palette.innerHTML = '';
+                    selectedShape = null;
+                    placedShapes = 0;
+                    currentLevel = levelIndex;
+                    levelIndicator.textContent = `Level ${levelIndex + 1}`;
+                    completionMessage.classList.remove('show');
+                    nextLevelButton.disabled = false; // Re-enable button for the next round.
+
+                    const level = levels[levelIndex];
+                    const shapePalette = [...level.shapes].sort(() => Math.random() - 0.5);
+
+                    level.shapes.forEach(shape => {
+                        const target = document.createElement('div');
+                        target.classList.add('shape', 'target-shape', getShapeClass(shape));
+                        target.dataset.id = shape.id;
+                        target.style.left = `${shape.x}%`;
+                        target.style.top = `${shape.y}%`;
+                        if (shape.rotation) target.style.transform = `rotate(${shape.rotation}deg)`;
+                        canvas.appendChild(target);
+                    });
+
+                    shapePalette.forEach(shape => {
+                        // [BUG-003] Use semantic button for accessibility
+                        const paletteButton = document.createElement('button');
+                        paletteButton.classList.add('palette-button');
+                        paletteButton.setAttribute('aria-label', `Select ${shape.color} ${shape.type}`);
+                        
+                        const paletteShapeDiv = document.createElement('div');
+                        paletteShapeDiv.classList.add('shape', getShapeClass(shape));
+                        paletteShapeDiv.dataset.shape = JSON.stringify(shape);
+                        
+                        paletteButton.appendChild(paletteShapeDiv);
+                        paletteButton.addEventListener('click', handlePaletteClick);
+                        palette.appendChild(paletteButton);
+                    });
+
+                    // Level is now loaded and ready for interaction.
+                    setTimeout(() => { isTransitioning = false; }, 100); // Small buffer
+                }
+
+                function handlePaletteClick(e) {
+                    const button = e.currentTarget;
+                    const shapeDiv = button.querySelector('.shape');
+                    if (selectedShape || !shapeDiv) return;
+
+                    const shapeData = JSON.parse(shapeDiv.dataset.shape);
+                    selectedShape = { ...shapeData, element: button }; // Store button element
+                    
+                    cursorGhost.className = `cursor-ghost shape ${getShapeClass(selectedShape)}`;
+                    cursorGhost.style.transform = `translate(-50%, -50%) ${selectedShape.rotation ? `rotate(${selectedShape.rotation}deg)` : ''}`;
+                    document.body.classList.add('ghost-active');
+
+                    button.style.opacity = '0.3';
+                    button.style.pointerEvents = 'none';
+                }
+                
+                function handleCanvasClick(e) {
+                    if (!selectedShape) return;
+                    const rect = canvas.getBoundingClientRect();
+                    const x = ((e.clientX - rect.left) / rect.width) * 100;
+                    const y = ((e.clientY - rect.top) / rect.height) * 100;
+                    const tolerance = 8;
+                    const dx = x - (selectedShape.x + 6);
+                    const dy = y - (selectedShape.y + 6);
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance <= tolerance) { placeShape(); } else { resetSelection(); }
+                }
+
+                function placeShape() {
+                    const placed = document.createElement('div');
+                    placed.classList.add('shape', 'placed-shape', getShapeClass(selectedShape));
+                    placed.style.left = `${selectedShape.x}%`;
+                    placed.style.top = `${selectedShape.y}%`;
+                    if (selectedShape.rotation) placed.style.transform = `rotate(${selectedShape.rotation}deg)`;
+                    canvas.appendChild(placed);
+                    
+                    const targetOutline = canvas.querySelector(`.target-shape[data-id='${selectedShape.id}']`);
+                    if (targetOutline) targetOutline.style.opacity = '0';
+                    
+                    selectedShape.element.remove();
+                    resetSelection(false);
+                    placedShapes++;
+                    
+                    if (placedShapes === levels[currentLevel].shapes.length) {
+                        setTimeout(() => completionMessage.classList.add('show'), 500);
+                    }
+                }
+
+                function resetSelection(isIncorrect = true) {
+                    if (isIncorrect && selectedShape && selectedShape.element) {
+                        selectedShape.element.style.opacity = '1';
+                        selectedShape.element.style.pointerEvents = 'auto';
+                    }
+                    selectedShape = null;
+                    document.body.classList.remove('ghost-active');
+                }
+
+                function handleMouseMove(e) {
+                    if (document.body.classList.contains('ghost-active')) {
+                        cursorGhost.style.left = `${e.clientX}px`;
+                        cursorGhost.style.top = `${e.clientY}px`;
+                    }
+                }
+
+                function handleNextLevel() {
+                    if (isTransitioning) return; // [BUG-002] Redundant check for safety.
+                    nextLevelButton.disabled = true; // [BUG-002] Disable button immediately.
+                    const next = (currentLevel + 1) % levels.length;
+                    loadLevel(next);
+                }
+
+                // [BUG-004] Add resize listener to prevent ghost desync.
+                function handleResize() {
+                    if(selectedShape) {
+                        resetSelection();
+                    }
+                }
+                
+                canvas.addEventListener('click', handleCanvasClick);
+                document.addEventListener('mousemove', handleMouseMove);
+                nextLevelButton.addEventListener('click', handleNextLevel);
+                window.addEventListener('resize', handleResize); // [BUG-004] Listener activated.
+
+                loadLevel(0);
+            });
+        })();
+    </script>
+</body>
+</html>
