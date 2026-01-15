@@ -10,59 +10,288 @@
 
     <style>
         :root {
-            --bg-color: #f5f5f7;
-            --font-color: #8a8a8e;
-            --border-color: #e0e0e2;
-            --shadow-color: rgba(0, 0, 0, 0.05);
-            --shape-blue: #8ab4f8;
-            --shape-pink: #f88ab4;
-            --shape-green: #8af8c4;
-            --shape-yellow: #f8d48a;
-            --target-outline-color: #d1d1d6;
+            /* Palette - Refined & Vibrant */
+            --bg-base: #f2f4f8;
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+
+            --glass-bg: rgba(255, 255, 255, 0.65);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+            --card-radius: 24px;
+
+            --shape-blue-grad: linear-gradient(135deg, #aaccff 0%, #6b9df2 100%);
+            --shape-pink-grad: linear-gradient(135deg, #ffcce0 0%, #f28bb3 100%);
+            --shape-green-grad: linear-gradient(135deg, #b8f2d6 0%, #76e0a8 100%);
+            --shape-yellow-grad: linear-gradient(135deg, #ffeaa3 0%, #f2c94c 100%);
+
+            /* Solid colors for borders/triangles fallback */
+            --col-blue: #6b9df2;
+            --col-pink: #f28bb3;
+            --col-green: #76e0a8;
+            --col-yellow: #f2c94c;
+
+            --target-outline-color: #c0c0c8;
+            --shape-shadow: 0 10px 20px -5px rgba(0,0,0,0.15), inset 0 2px 4px rgba(255,255,255,0.4);
+            --placed-shadow: 0 4px 10px -2px rgba(0,0,0,0.1);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--font-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; user-select: none; cursor: default; }
-        .game-world { width: 100%; max-width: 500px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .game-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 20px; }
-        .game-title { font-size: 24px; font-weight: 400; color: #1d1d1f; }
-        .level-indicator { font-size: 16px; font-weight: 300; }
-        .game-container { width: 100%; position: relative; }
-        .canvas { width: 100%; padding-bottom: 100%; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; box-shadow: 0 4px 15px var(--shadow-color); position: relative; overflow: hidden; cursor: none; }
-        .palette { margin-top: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; min-height: 80px; }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-base);
+            /* Subtle Mesh Gradient Background */
+            background-image:
+                radial-gradient(at 0% 0%, hsla(253,16%,72%,0.15) 0, transparent 50%),
+                radial-gradient(at 50% 100%, hsla(225,39%,80%,0.15) 0, transparent 50%),
+                radial-gradient(at 100% 0%, hsla(339,49%,80%,0.15) 0, transparent 50%);
+            background-size: 200% 200%;
+            animation: bg-shift 30s ease infinite;
+            color: var(--text-secondary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            user-select: none;
+            cursor: default;
+        }
+        @keyframes bg-shift { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+        .game-world {
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh; /* Full height for mobile adjustment */
+            justify-content: center;
+        }
+
+        .game-header {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 0 4px;
+            margin-bottom: 24px;
+        }
+
+        .game-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .level-indicator {
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-secondary);
+            background: rgba(255,255,255,0.5);
+            padding: 6px 12px;
+            border-radius: 20px;
+        }
+
+        .game-container {
+            width: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .canvas {
+            width: 100%;
+            padding-bottom: 100%; /* Aspect ratio 1:1 */
+            background-color: var(--glass-bg);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--card-radius);
+            box-shadow: var(--glass-shadow);
+            position: relative;
+            overflow: hidden;
+            cursor: none; /* We use custom ghost cursor for everything inside or just let the pointer be and use ghost for drag? Stick to original logic for now. */
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        /* Desktop Hover on Canvas */
+        @media (hover: hover) {
+            .canvas:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.1);
+            }
+        }
+
+        .palette {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+            min-height: 80px;
+            padding: 10px;
+        }
         
         /* [BUG-003] Use button for accessibility */
-        .palette-button { background: none; border: none; padding: 0; cursor: pointer; }
-        .palette-button:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; border-radius: inherit; } /* Improve focus visibility */
-        .palette-button .shape { transition: transform 0.2s ease-out, opacity 0.3s ease; }
-        .palette-button:hover .shape { transform: scale(1.1); }
+        .palette-button {
+            background: none;
+            border: none;
+            padding: 10px; /* Increase touch target */
+            margin: -10px;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
 
-        .shape { width: 60px; height: 60px; }
-        .target-shape { position: absolute; border: 2px dashed var(--target-outline-color); transition: opacity 0.5s ease; }
-        .placed-shape { position: absolute; border: none; animation: place-anim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes place-anim { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .palette-button:focus-visible {
+            outline: none;
+        }
+        .palette-button:focus-visible .shape {
+            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.3);
+        }
+
+        /* Hover Effect for Palette */
+        .palette-button:hover { transform: scale(1.1); }
+        .palette-button:active { transform: scale(0.95); }
+
+        /* Shape Styling */
+        .shape {
+            width: 64px;
+            height: 64px;
+            box-shadow: var(--shape-shadow);
+            position: relative;
+        }
+
+        /* Target outlines should be subtle */
+        .target-shape {
+            position: absolute;
+            border: 2px dashed var(--target-outline-color);
+            box-shadow: none;
+            background: rgba(0,0,0,0.02);
+            transition: all 0.3s ease;
+        }
+        /* When dragging, valid targets could pulse - (Added in JS step later, but styled here) */
+        .target-shape.active-target {
+            border-color: var(--col-blue);
+            background: rgba(107, 157, 242, 0.1);
+            transform: scale(1.05);
+        }
+
+        .placed-shape {
+            position: absolute;
+            border: none;
+            animation: place-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: var(--placed-shadow);
+        }
+        @keyframes place-pop {
+            0% { transform: scale(0.5); opacity: 0; }
+            60% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 1; }
+        }
         
-        .shape-blue { background-color: var(--shape-blue); }
-        .shape-pink { background-color: var(--shape-pink); }
-        .shape-green { background-color: var(--shape-green); }
-        .shape-yellow { background-color: var(--shape-yellow); }
+        /* Gradients for Shapes */
+        .shape-blue { background: var(--shape-blue-grad); }
+        .shape-pink { background: var(--shape-pink-grad); }
+        .shape-green { background: var(--shape-green-grad); }
+        .shape-yellow { background: var(--shape-yellow-grad); }
 
         .shape-circle { border-radius: 50%; }
-        .shape-triangle { background-color: transparent !important; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; }
-        .shape-triangle.shape-blue { border-bottom: 60px solid var(--shape-blue); }
-        .shape-triangle.shape-pink { border-bottom: 60px solid var(--shape-pink); }
-        .shape-triangle.shape-green { border-bottom: 60px solid var(--shape-green); }
-        .shape-triangle.shape-yellow { border-bottom: 60px solid var(--shape-yellow); }
         
-        .cursor-ghost { position: fixed; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; z-index: 100; transform: translate(-50%, -50%); }
-        body.ghost-active .cursor-ghost { opacity: 0.8; }
+        /* Triangles are tricky with gradients. We can use clip-path for better gradient support! */
+        .shape-triangle {
+            background: var(--shape-blue-grad); /* Default, overridden below */
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            width: 64px; height: 64px; /* Maintain aspect ratio box */
+            box-shadow: none; /* Clip path kills box shadow, filter drop-shadow needed */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+        /* Override bg for triangle variants */
+        .shape-triangle.shape-blue { background: var(--shape-blue-grad); }
+        .shape-triangle.shape-pink { background: var(--shape-pink-grad); }
+        .shape-triangle.shape-green { background: var(--shape-green-grad); }
+        .shape-triangle.shape-yellow { background: var(--shape-yellow-grad); }
+
+        .cursor-ghost {
+            position: fixed;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s ease, transform 0.1s linear; /* Smooth follow */
+            z-index: 100;
+            margin-top: -10px; /* Offset slightly to appear picked up */
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.2));
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+        body.ghost-active .cursor-ghost { opacity: 0.9; }
         
-        .completion-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(245, 245, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
+        /* Completion Modal - Glassmorphism */
+        .completion-message {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            z-index: 200; opacity: 0; pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
         .completion-message.show { opacity: 1; pointer-events: all; }
-        .completion-message p { font-size: 36px; font-weight: 300; color: #1d1d1f; animation: fade-in-up 0.6s ease-out forwards; }
-        #next-level-button { margin-top: 20px; padding: 10px 25px; font-size: 16px; font-weight: 400; color: #fff; background-color: #007aff; border: none; border-radius: 30px; cursor: pointer; transition: background-color 0.2s ease, opacity 0.2s ease; animation: fade-in-up 0.6s 0.2s ease-out forwards; opacity: 0; }
-        #next-level-button:hover { background-color: #005ecb; }
-        #next-level-button:disabled { background-color: #8a8a8e; cursor: not-allowed; } /* [BUG-002] Disabled state */
+
+        .completion-message p {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1d1d1f 0%, #48484a 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: scale(0.8);
+            text-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .completion-message.show p {
+            animation: fade-in-scale 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        #next-level-button {
+            padding: 16px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            background: linear-gradient(135deg, #007aff, #005ecb);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 122, 255, 0.3);
+            transition: all 0.2s ease;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        .completion-message.show #next-level-button {
+            animation: fade-in-up 0.5s 0.2s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        #next-level-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 122, 255, 0.4);
+        }
+        #next-level-button:active { transform: translateY(1px); }
+        #next-level-button:disabled { background: #d1d1d6; cursor: not-allowed; box-shadow: none; }
+
         @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fade-in-scale { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+        /* Media Queries for Mobile/Desktop specifics */
+        @media (max-width: 600px) {
+            .game-world { padding: 20px; }
+            .game-title { font-size: 24px; }
+            .shape { width: 50px; height: 50px; }
+            .palette { gap: 15px; }
+        }
     </style>
 </head>
 <body>
@@ -94,12 +323,82 @@
                 const nextLevelButton = document.getElementById('next-level-button');
                 const cursorGhost = document.getElementById('cursor-ghost');
 
+                // Audio Context for subtle SFX
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
                 let currentLevel = 0;
                 let selectedShape = null;
                 let placedShapes = 0;
                 let isTransitioning = false; // [BUG-002] State flag for level transitions.
 
-                const levels = [ /* Level data remains the same */ { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] }, { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] }, { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }];
+                const levels = [
+                    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] },
+                    { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] },
+                    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }
+                ];
+
+                function playPopSound() {
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(500, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.15);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.15);
+                }
+
+                function playSuccessSound() {
+                    if (audioCtx.state === 'suspended') audioCtx.resume();
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(800, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+
+                function spawnParticles(x, y, color) {
+                    const particleCount = 12;
+                    const rootStyles = getComputedStyle(document.body);
+                    const bg = rootStyles.getPropertyValue(`--col-${color}`).trim() || '#fff';
+
+                    for (let i = 0; i < particleCount; i++) {
+                        const p = document.createElement('div');
+                        p.style.position = 'fixed';
+                        p.style.left = x + 'px';
+                        p.style.top = y + 'px';
+                        p.style.width = '8px';
+                        p.style.height = '8px';
+                        p.style.borderRadius = '50%';
+                        p.style.backgroundColor = bg;
+                        p.style.pointerEvents = 'none';
+                        p.style.zIndex = '150';
+                        document.body.appendChild(p);
+
+                        const angle = Math.random() * Math.PI * 2;
+                        const velocity = 30 + Math.random() * 60;
+                        const tx = Math.cos(angle) * velocity;
+                        const ty = Math.sin(angle) * velocity;
+
+                        p.animate([
+                            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                            { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`, opacity: 0 }
+                        ], {
+                            duration: 500 + Math.random() * 200,
+                            easing: 'cubic-bezier(0, .9, .57, 1)',
+                        }).onfinish = () => p.remove();
+                    }
+                }
 
                 function getShapeClass(shape) { return `shape-${shape.type} shape-${shape.color}`; }
 
@@ -121,7 +420,7 @@
 
                     level.shapes.forEach(shape => {
                         const target = document.createElement('div');
-                        target.classList.add('shape', 'target-shape', getShapeClass(shape));
+                        target.classList.add('shape', 'target-shape', ...getShapeClass(shape).split(' '));
                         target.dataset.id = shape.id;
                         target.style.left = `${shape.x}%`;
                         target.style.top = `${shape.y}%`;
@@ -136,7 +435,7 @@
                         paletteButton.setAttribute('aria-label', `Select ${shape.color} ${shape.type}`);
                         
                         const paletteShapeDiv = document.createElement('div');
-                        paletteShapeDiv.classList.add('shape', getShapeClass(shape));
+                        paletteShapeDiv.classList.add('shape', ...getShapeClass(shape).split(' '));
                         paletteShapeDiv.dataset.shape = JSON.stringify(shape);
                         
                         paletteButton.appendChild(paletteShapeDiv);
@@ -162,6 +461,17 @@
 
                     button.style.opacity = '0.3';
                     button.style.pointerEvents = 'none';
+
+                    // Highlight targets
+                    const targets = document.querySelectorAll('.target-shape');
+                    targets.forEach(t => {
+                        // Note: dataset.id is string, shapeData.id is number usually
+                        if (t.dataset.id == shapeData.id) {
+                            t.classList.add('active-target');
+                        }
+                    });
+
+                    playPopSound();
                 }
                 
                 function handleCanvasClick(e) {
@@ -174,12 +484,16 @@
                     const dy = y - (selectedShape.y + 6);
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
-                    if (distance <= tolerance) { placeShape(); } else { resetSelection(); }
+                    if (distance <= tolerance) {
+                        placeShape();
+                    } else {
+                        resetSelection();
+                    }
                 }
 
                 function placeShape() {
                     const placed = document.createElement('div');
-                    placed.classList.add('shape', 'placed-shape', getShapeClass(selectedShape));
+                    placed.classList.add('shape', 'placed-shape', ...getShapeClass(selectedShape).split(' '));
                     placed.style.left = `${selectedShape.x}%`;
                     placed.style.top = `${selectedShape.y}%`;
                     if (selectedShape.rotation) placed.style.transform = `rotate(${selectedShape.rotation}deg)`;
@@ -188,11 +502,28 @@
                     const targetOutline = canvas.querySelector(`.target-shape[data-id='${selectedShape.id}']`);
                     if (targetOutline) targetOutline.style.opacity = '0';
                     
+                    // Particles
+                    const rect = canvas.getBoundingClientRect();
+                    // shape center x/y relative to viewport
+                    const shapeCenterX = rect.left + (rect.width * selectedShape.x / 100) + (rect.width * 0.06); // + half shape width approx?
+                    // actually shape.x is left, so + shape width/2.
+                    // css shape width is 64px, which is fixed, but logic uses % position.
+                    // The original logic `x - (selectedShape.x + 6)` implies shape is about 12% width?
+                    // Let's just use the click coordinates? No, `placeShape` doesn't have event.
+                    // Let's calculate center based on element.
+                    // .shape width is 64px.
+                    const shapePixelX = rect.left + (rect.width * selectedShape.x / 100) + 32;
+                    const shapePixelY = rect.top + (rect.height * selectedShape.y / 100) + 32;
+                    spawnParticles(shapePixelX, shapePixelY, selectedShape.color);
+
+                    playPopSound();
+
                     selectedShape.element.remove();
                     resetSelection(false);
                     placedShapes++;
                     
                     if (placedShapes === levels[currentLevel].shapes.length) {
+                        playSuccessSound();
                         setTimeout(() => completionMessage.classList.add('show'), 500);
                     }
                 }
@@ -201,15 +532,28 @@
                     if (isIncorrect && selectedShape && selectedShape.element) {
                         selectedShape.element.style.opacity = '1';
                         selectedShape.element.style.pointerEvents = 'auto';
+                        // Feedback for error? Maybe shake animation?
                     }
                     selectedShape = null;
                     document.body.classList.remove('ghost-active');
+
+                    const targets = document.querySelectorAll('.active-target');
+                    targets.forEach(t => t.classList.remove('active-target'));
                 }
 
                 function handleMouseMove(e) {
                     if (document.body.classList.contains('ghost-active')) {
                         cursorGhost.style.left = `${e.clientX}px`;
                         cursorGhost.style.top = `${e.clientY}px`;
+                    }
+                }
+
+                function handleTouchMove(e) {
+                    if (document.body.classList.contains('ghost-active')) {
+                        e.preventDefault();
+                        const touch = e.touches[0];
+                        cursorGhost.style.left = `${touch.clientX}px`;
+                        cursorGhost.style.top = `${touch.clientY - 60}px`; // Offset to be visible above finger
                     }
                 }
 
@@ -229,6 +573,7 @@
                 
                 canvas.addEventListener('click', handleCanvasClick);
                 document.addEventListener('mousemove', handleMouseMove);
+                document.addEventListener('touchmove', handleTouchMove, { passive: false });
                 nextLevelButton.addEventListener('click', handleNextLevel);
                 window.addEventListener('resize', handleResize); // [BUG-004] Listener activated.
 
