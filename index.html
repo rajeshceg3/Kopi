@@ -2,239 +2,668 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kopī (Secured)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Kopī</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
         :root {
-            --bg-color: #f5f5f7;
-            --font-color: #8a8a8e;
-            --border-color: #e0e0e2;
-            --shadow-color: rgba(0, 0, 0, 0.05);
-            --shape-blue: #8ab4f8;
-            --shape-pink: #f88ab4;
-            --shape-green: #8af8c4;
-            --shape-yellow: #f8d48a;
-            --target-outline-color: #d1d1d6;
+            /* World Class Color Palette */
+            --bg-gradient: radial-gradient(120% 120% at 50% 100%, #f0f2f5 0%, #ffffff 100%);
+            --text-primary: #1d1d1f;
+            --text-secondary: #86868b;
+
+            --color-blue: #007AFF;
+            --color-pink: #FF2D55;
+            --color-green: #34C759;
+            --color-yellow: #FFCC00;
+
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
+            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
+            --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --radius-full: 999px;
+
+            --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background-color: var(--bg-color); color: var(--font-color); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; user-select: none; cursor: default; }
-        .game-world { width: 100%; max-width: 500px; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .game-header { width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0 10px; margin-bottom: 20px; }
-        .game-title { font-size: 24px; font-weight: 400; color: #1d1d1f; }
-        .level-indicator { font-size: 16px; font-weight: 300; }
-        .game-container { width: 100%; position: relative; }
-        .canvas { width: 100%; padding-bottom: 100%; background-color: #ffffff; border: 1px solid var(--border-color); border-radius: 18px; box-shadow: 0 4px 15px var(--shadow-color); position: relative; overflow: hidden; cursor: none; }
-        .palette { margin-top: 30px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; min-height: 80px; }
-        
-        /* [BUG-003] Use button for accessibility */
-        .palette-button { background: none; border: none; padding: 0; cursor: pointer; }
-        .palette-button:focus-visible { outline: 2px solid #007aff; outline-offset: 2px; border-radius: inherit; } /* Improve focus visibility */
-        .palette-button .shape { transition: transform 0.2s ease-out, opacity 0.3s ease; }
-        .palette-button:hover .shape { transform: scale(1.1); }
 
-        .shape { width: 60px; height: 60px; }
-        .target-shape { position: absolute; border: 2px dashed var(--target-outline-color); transition: opacity 0.5s ease; }
-        .placed-shape { position: absolute; border: none; animation: place-anim 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes place-anim { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
         
-        .shape-blue { background-color: var(--shape-blue); }
-        .shape-pink { background-color: var(--shape-pink); }
-        .shape-green { background-color: var(--shape-green); }
-        .shape-yellow { background-color: var(--shape-yellow); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-primary);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            touch-action: none; /* Prevent scroll on mobile */
+        }
 
-        .shape-circle { border-radius: 50%; }
-        .shape-triangle { background-color: transparent !important; width: 0; height: 0; border-left: 30px solid transparent; border-right: 30px solid transparent; }
-        .shape-triangle.shape-blue { border-bottom: 60px solid var(--shape-blue); }
-        .shape-triangle.shape-pink { border-bottom: 60px solid var(--shape-pink); }
-        .shape-triangle.shape-green { border-bottom: 60px solid var(--shape-green); }
-        .shape-triangle.shape-yellow { border-bottom: 60px solid var(--shape-yellow); }
+        /* Layout Container */
+        .app-container {
+            width: 100%;
+            height: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 4px;
+            margin-bottom: 10px;
+            z-index: 10;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .level-badge {
+            background: rgba(0, 0, 0, 0.05);
+            padding: 6px 14px;
+            border-radius: var(--radius-full);
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Game Area */
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            position: relative;
+        }
+
+        .canvas-container {
+            width: 100%;
+            max-width: 400px; /* Optimal play size */
+            aspect-ratio: 1;
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(255,255,255,0.5);
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s var(--ease-smooth);
+        }
+
+        /* Mobile Optimization: Use available space but keep aspect ratio */
+        @media (max-width: 450px) {
+            .canvas-container {
+                width: 90vw;
+            }
+        }
+
+        /* Palette (Dock) */
+        .palette {
+            margin-top: auto;
+            width: 100%;
+            min-height: 100px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            z-index: 20;
+            margin-bottom: 20px;
+        }
+
+        /* Shapes */
+        .shape {
+            width: 64px;
+            height: 64px;
+            position: absolute;
+            will-change: transform;
+            /* Default transform for centering if needed, but we position by top/left % */
+        }
+
+        /* Shape Rendering using Clip Path for smoother edges and hardware accel */
+        .shape-render {
+            width: 100%;
+            height: 100%;
+            border-radius: 14px; /* Default for square */
+            transition: transform 0.3s var(--ease-elastic), opacity 0.2s ease;
+            box-shadow: inset 0 -4px 4px rgba(0,0,0,0.1); /* Subtle depth */
+        }
+
+        .shape.in-palette {
+            position: relative;
+            cursor: grab;
+            touch-action: none;
+        }
+
+        .shape.in-palette:active {
+            cursor: grabbing;
+        }
+
+        .shape.in-palette .shape-render {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 -4px 4px rgba(0,0,0,0.1);
+        }
+
+        .shape.in-palette.dragging {
+            opacity: 0.3;
+        }
+
+        /* Shape Types */
+        .type-circle .shape-render { border-radius: 50%; }
+
+        .type-triangle .shape-render {
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            border-radius: 0;
+            padding-bottom: 10%; /* Visual adjustment */
+        }
+
+        /* Colors */
+        .color-blue .shape-render { background: var(--color-blue); }
+        .color-pink .shape-render { background: var(--color-pink); }
+        .color-green .shape-render { background: var(--color-green); }
+        .color-yellow .shape-render { background: var(--color-yellow); }
+
+        /* Targets */
+        .target {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            opacity: 0.4;
+            transform-origin: center;
+        }
+
+        .target .shape-render {
+            background: transparent;
+            border: 3px dashed #c7c7cc;
+            box-shadow: none;
+        }
+
+        /* Triangle Target fix: borders don't work well with clip-path, so use SVG or a trick.
+           Let's use a pseudo-element or SVG for targets for perfect dashed lines.
+           Actually, for simplicity and slickness, let's use a semi-transparent filled target.
+        */
+        .target .shape-render {
+            background: rgba(0,0,0,0.06);
+            border: none;
+            /* If we want dashed border, it's hard with clip-path.
+               Filled low-opacity is modern and clean. */
+        }
+
+        .target.highlight .shape-render {
+            background: rgba(0,0,0,0.12);
+            transform: scale(1.05);
+        }
+
+        /* Placed Shape */
+        .shape.placed {
+            pointer-events: none;
+        }
+        .shape.placed .shape-render {
+            animation: popIn 0.5s var(--ease-elastic) forwards;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        /* Drag Ghost */
+        .drag-ghost {
+            position: fixed;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 1000;
+            will-change: transform;
+            width: 64px;
+            height: 64px;
+            margin-left: -32px; /* Center on pointer */
+            margin-top: -32px;
+            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.25));
+        }
+
+        .drag-ghost .shape-render {
+            transform: scale(1.15); /* Slightly larger while dragging */
+        }
+
+        /* Overlay */
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(255,255,255,0.4);
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+            z-index: 50;
+            border-radius: var(--radius-lg);
+        }
+
+        .overlay.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .overlay h2 {
+            font-size: 32px;
+            margin: 0 0 20px 0;
+            background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s var(--ease-smooth);
+        }
+
+        .overlay.visible h2 {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .btn-next {
+            background: var(--text-primary);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s var(--ease-smooth) 0.1s;
+        }
         
-        .cursor-ghost { position: fixed; pointer-events: none; opacity: 0; transition: opacity 0.2s ease; z-index: 100; transform: translate(-50%, -50%); }
-        body.ghost-active .cursor-ghost { opacity: 0.8; }
+        .btn-next:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(0,0,0,0.3);
+        }
+
+        .overlay.visible .btn-next {
+            transform: translateY(0);
+            opacity: 1;
+        }
         
-        .completion-message { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(245, 245, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.5s ease; }
-        .completion-message.show { opacity: 1; pointer-events: all; }
-        .completion-message p { font-size: 36px; font-weight: 300; color: #1d1d1f; animation: fade-in-up 0.6s ease-out forwards; }
-        #next-level-button { margin-top: 20px; padding: 10px 25px; font-size: 16px; font-weight: 400; color: #fff; background-color: #007aff; border: none; border-radius: 30px; cursor: pointer; transition: background-color 0.2s ease, opacity 0.2s ease; animation: fade-in-up 0.6s 0.2s ease-out forwards; opacity: 0; }
-        #next-level-button:hover { background-color: #005ecb; }
-        #next-level-button:disabled { background-color: #8a8a8e; cursor: not-allowed; } /* [BUG-002] Disabled state */
-        @keyframes fade-in-up { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20% { transform: translateX(-6px); }
+            40% { transform: translateX(6px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
+        }
+        
+        .shake-element {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
     </style>
 </head>
 <body>
 
-    <main class="game-world" role="application">
-        <header class="game-header">
-            <h1 class="game-title">Kopī</h1>
-            <div id="level-indicator" class="level-indicator">Level 1</div>
-        </header>
-        <div id="game-container" class="game-container">
-            <div id="canvas" class="canvas"></div>
-            <div id="palette" class="palette"></div>
+<div class="app-container">
+    <header class="header">
+        <div class="logo">Kopī</div>
+        <div class="level-badge" id="level-display">Level 1</div>
+    </header>
+
+    <div class="game-area">
+        <div class="canvas-container" id="canvas-container">
+            <div id="game-canvas" style="width: 100%; height: 100%; position: relative;"></div>
+
+            <div class="overlay" id="completion-overlay">
+                <h2>Perfect</h2>
+                <button class="btn-next" id="btn-next">Continue</button>
+            </div>
         </div>
-        <div id="completion-message" class="completion-message">
-            <p>Complete</p>
-            <button id="next-level-button">Next</button>
-        </div>
-        <div id="cursor-ghost" class="cursor-ghost"></div>
-    </main>
+    </div>
 
-    <script>
-        // [BUG-001] Encapsulate entire script in an IIFE to prevent global scope pollution.
-        (() => {
-            document.addEventListener('DOMContentLoaded', () => {
-                const canvas = document.getElementById('canvas');
-                const palette = document.getElementById('palette');
-                const levelIndicator = document.getElementById('level-indicator');
-                const completionMessage = document.getElementById('completion-message');
-                const nextLevelButton = document.getElementById('next-level-button');
-                const cursorGhost = document.getElementById('cursor-ghost');
+    <div class="palette" id="palette">
+        <!-- Palette Items Generated Here -->
+    </div>
+</div>
 
-                let currentLevel = 0;
-                let selectedShape = null;
-                let placedShapes = 0;
-                let isTransitioning = false; // [BUG-002] State flag for level transitions.
+<script>
+/**
+ * Kopī - World Class UX Polish
+ * Optimized for Touch (Mobile) and Mouse (Desktop)
+ */
 
-                const levels = [ /* Level data remains the same */ { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] }, { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] }, { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }];
+(() => {
+const LEVELS = [
+    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] },
+    { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] },
+    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }
+];
 
-                function getShapeClass(shape) { return `shape-${shape.type} shape-${shape.color}`; }
+class Game {
+    constructor() {
+        this.levelIndex = 0;
+        this.currentLevel = null;
+        this.placedCount = 0;
 
-                function loadLevel(levelIndex) {
-                    if (isTransitioning) return; // [BUG-002] Prevent concurrent loading.
-                    isTransitioning = true;
-                    
-                    canvas.innerHTML = '';
-                    palette.innerHTML = '';
-                    selectedShape = null;
-                    placedShapes = 0;
-                    currentLevel = levelIndex;
-                    levelIndicator.textContent = `Level ${levelIndex + 1}`;
-                    completionMessage.classList.remove('show');
-                    nextLevelButton.disabled = false; // Re-enable button for the next round.
+        // DOM Elements
+        this.canvas = document.getElementById('game-canvas');
+        this.palette = document.getElementById('palette');
+        this.levelDisplay = document.getElementById('level-display');
+        this.overlay = document.getElementById('completion-overlay');
+        this.btnNext = document.getElementById('btn-next');
 
-                    const level = levels[levelIndex];
-                    const shapePalette = [...level.shapes].sort(() => Math.random() - 0.5);
+        // Drag State
+        this.dragItem = null; // The original element in palette
+        this.dragGhost = null; // The floating element
+        this.dragData = null; // Shape data
 
-                    level.shapes.forEach(shape => {
-                        const target = document.createElement('div');
-                        target.classList.add('shape', 'target-shape', getShapeClass(shape));
-                        target.dataset.id = shape.id;
-                        target.style.left = `${shape.x}%`;
-                        target.style.top = `${shape.y}%`;
-                        if (shape.rotation) target.style.transform = `rotate(${shape.rotation}deg)`;
-                        canvas.appendChild(target);
-                    });
+        this.init();
+    }
 
-                    shapePalette.forEach(shape => {
-                        // [BUG-003] Use semantic button for accessibility
-                        const paletteButton = document.createElement('button');
-                        paletteButton.classList.add('palette-button');
-                        paletteButton.setAttribute('aria-label', `Select ${shape.color} ${shape.type}`);
-                        
-                        const paletteShapeDiv = document.createElement('div');
-                        paletteShapeDiv.classList.add('shape', getShapeClass(shape));
-                        paletteShapeDiv.dataset.shape = JSON.stringify(shape);
-                        
-                        paletteButton.appendChild(paletteShapeDiv);
-                        paletteButton.addEventListener('click', handlePaletteClick);
-                        palette.appendChild(paletteButton);
-                    });
+    init() {
+        this.btnNext.addEventListener('click', () => this.nextLevel());
+        this.loadLevel(this.levelIndex);
 
-                    // Level is now loaded and ready for interaction.
-                    setTimeout(() => { isTransitioning = false; }, 100); // Small buffer
+        // Global Pointer Events for Dragging
+        window.addEventListener('pointermove', (e) => this.onPointerMove(e));
+        window.addEventListener('pointerup', (e) => this.onPointerUp(e));
+        window.addEventListener('pointercancel', (e) => this.onPointerUp(e));
+    }
+
+    loadLevel(index) {
+        this.levelIndex = index;
+        this.currentLevel = LEVELS[this.levelIndex % LEVELS.length];
+        this.placedCount = 0;
+
+        this.levelDisplay.textContent = `Level ${this.levelIndex + 1}`;
+        this.overlay.classList.remove('visible');
+
+        // Clear board
+        this.canvas.innerHTML = '';
+        this.palette.innerHTML = '';
+
+        // Render Targets
+        this.currentLevel.shapes.forEach(shape => {
+            const el = document.createElement('div');
+            el.className = `shape target type-${shape.type} color-${shape.color}`;
+            el.dataset.id = shape.id;
+
+            // Positioning
+            el.style.left = `${shape.x}%`;
+            el.style.top = `${shape.y}%`;
+            // Center alignment fix (64px is hardcoded width, so we need to offset)
+            // But % is usually top-left. Let's assume % is coordinate of top-left.
+            // Wait, previous code had manual offsets.
+            // Let's refine: % should be center.
+            // Current CSS uses top/left directly.
+            // Let's stick to Top/Left as per data, but center the element visually using transform translate.
+            el.style.transform = `translate(-50%, -50%) ${shape.rotation ? `rotate(${shape.rotation}deg)` : ''}`;
+
+            const render = document.createElement('div');
+            render.className = 'shape-render';
+            el.appendChild(render);
+
+            this.canvas.appendChild(el);
+        });
+
+        // Render Palette (Shuffled)
+        const shuffled = [...this.currentLevel.shapes].sort(() => Math.random() - 0.5);
+        shuffled.forEach(shape => {
+            const el = document.createElement('div');
+            el.className = `shape in-palette type-${shape.type} color-${shape.color}`;
+            el.setAttribute('role', 'button');
+            el.setAttribute('tabindex', '0');
+            el.setAttribute('aria-label', `${shape.color} ${shape.type}`);
+
+            const render = document.createElement('div');
+            render.className = 'shape-render';
+            // Rotation in palette? Usually upright. Let's keep upright in palette.
+            if(shape.type === 'triangle' && shape.rotation) {
+                // visual adjustment only if needed, but usually icons are upright
+            }
+            el.appendChild(render);
+
+            // Attach Data
+            el.dataset.shape = JSON.stringify(shape);
+
+            // Event
+            el.addEventListener('pointerdown', (e) => this.onDragStart(e, el, shape));
+
+            this.palette.appendChild(el);
+        });
+    }
+
+    onDragStart(e, element, data) {
+        e.preventDefault(); // Prevent scrolling/text selection
+        if(this.dragGhost) return; // Already dragging
+
+        this.dragItem = element;
+        this.dragData = data;
+
+        // Haptic feedback if available
+        if (navigator.vibrate) navigator.vibrate(10);
+
+        // Create Ghost
+        this.dragGhost = element.cloneNode(true);
+        this.dragGhost.classList.remove('in-palette');
+        this.dragGhost.classList.add('drag-ghost');
+
+        // Apply rotation if needed (to match what it will look like on canvas)
+        if (data.rotation) {
+             this.dragGhost.querySelector('.shape-render').style.transform = `rotate(${data.rotation}deg)`;
+        }
+
+        document.body.appendChild(this.dragGhost);
+
+        // Visual state
+        this.dragItem.classList.add('dragging');
+
+        // Initial Position
+        this.updateGhostPosition(e.clientX, e.clientY);
+    }
+
+    onPointerMove(e) {
+        if (!this.dragGhost) return;
+        e.preventDefault();
+        this.updateGhostPosition(e.clientX, e.clientY);
+
+        // Check for hover highlighting
+        this.checkHover(e.clientX, e.clientY);
+    }
+
+    updateGhostPosition(x, y) {
+        this.dragGhost.style.transform = `translate(${x}px, ${y}px)`;
+    }
+
+    checkHover(x, y) {
+        // Simple hit testing for visual feedback
+        const targets = Array.from(this.canvas.querySelectorAll('.target'));
+        let hovered = null;
+
+        targets.forEach(target => {
+            const rect = target.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dist = Math.hypot(x - centerX, y - centerY);
+
+            target.classList.remove('highlight');
+
+            if (dist < 40 && target.dataset.id == this.dragData.id) { // Only highlight correct one
+                hovered = target;
+            }
+        });
+
+        if (hovered) hovered.classList.add('highlight');
+    }
+
+    onPointerUp(e) {
+        if (!this.dragGhost) return;
+
+        const dropped = this.attemptDrop(e.clientX, e.clientY);
+
+        if (dropped) {
+            // Success
+            this.dragItem.remove(); // Remove from palette
+            this.dragGhost.remove(); // Remove ghost
+            this.placedCount++;
+
+            // Check Win
+            if (this.placedCount === this.currentLevel.shapes.length) {
+                this.handleWin();
+            }
+        } else {
+            // Fail - Return to palette
+            this.dragItem.classList.remove('dragging');
+            this.dragGhost.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s';
+
+            // Fly back animation could be complex, simple opacity fade is cleaner for now
+            this.dragGhost.style.opacity = '0';
+
+            const ghostToRemove = this.dragGhost;
+            setTimeout(() => {
+                if(ghostToRemove) ghostToRemove.remove();
+            }, 300);
+
+            // Haptic
+            if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
+        }
+
+        this.dragItem = null;
+        this.dragGhost = null;
+        this.dragData = null;
+
+        // Clear highlights
+        document.querySelectorAll('.target.highlight').forEach(el => el.classList.remove('highlight'));
+    }
+
+    attemptDrop(x, y) {
+        const targets = Array.from(this.canvas.querySelectorAll('.target'));
+
+        for (let target of targets) {
+            // Skip already placed
+            if(target.classList.contains('filled')) continue;
+
+            const rect = target.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            const dist = Math.hypot(x - centerX, y - centerY);
+
+            // Threshold for drop (40px radius)
+            if (dist < 40) {
+                // Check ID match
+                if (parseInt(target.dataset.id) === this.dragData.id) {
+                    this.placeShape(target);
+                    return true;
                 }
+            }
+        }
+        return false;
+    }
 
-                function handlePaletteClick(e) {
-                    const button = e.currentTarget;
-                    const shapeDiv = button.querySelector('.shape');
-                    if (selectedShape || !shapeDiv) return;
+    placeShape(target) {
+        // Visual fill
+        const placed = document.createElement('div');
+        placed.className = `shape placed type-${this.dragData.type} color-${this.dragData.color}`;
+        placed.style.left = target.style.left;
+        placed.style.top = target.style.top;
+        placed.style.transform = target.style.transform;
 
-                    const shapeData = JSON.parse(shapeDiv.dataset.shape);
-                    selectedShape = { ...shapeData, element: button }; // Store button element
-                    
-                    cursorGhost.className = `cursor-ghost shape ${getShapeClass(selectedShape)}`;
-                    cursorGhost.style.transform = `translate(-50%, -50%) ${selectedShape.rotation ? `rotate(${selectedShape.rotation}deg)` : ''}`;
-                    document.body.classList.add('ghost-active');
+        const render = document.createElement('div');
+        render.className = 'shape-render';
+        placed.appendChild(render);
 
-                    button.style.opacity = '0.3';
-                    button.style.pointerEvents = 'none';
-                }
-                
-                function handleCanvasClick(e) {
-                    if (!selectedShape) return;
-                    const rect = canvas.getBoundingClientRect();
-                    const x = ((e.clientX - rect.left) / rect.width) * 100;
-                    const y = ((e.clientY - rect.top) / rect.height) * 100;
-                    const tolerance = 8;
-                    const dx = x - (selectedShape.x + 6);
-                    const dy = y - (selectedShape.y + 6);
-                    const distance = Math.sqrt(dx * dx + dy * dy);
+        this.canvas.appendChild(placed);
 
-                    if (distance <= tolerance) { placeShape(); } else { resetSelection(); }
-                }
+        // Hide target visually
+        target.style.opacity = 0;
+        target.classList.add('filled');
 
-                function placeShape() {
-                    const placed = document.createElement('div');
-                    placed.classList.add('shape', 'placed-shape', getShapeClass(selectedShape));
-                    placed.style.left = `${selectedShape.x}%`;
-                    placed.style.top = `${selectedShape.y}%`;
-                    if (selectedShape.rotation) placed.style.transform = `rotate(${selectedShape.rotation}deg)`;
-                    canvas.appendChild(placed);
-                    
-                    const targetOutline = canvas.querySelector(`.target-shape[data-id='${selectedShape.id}']`);
-                    if (targetOutline) targetOutline.style.opacity = '0';
-                    
-                    selectedShape.element.remove();
-                    resetSelection(false);
-                    placedShapes++;
-                    
-                    if (placedShapes === levels[currentLevel].shapes.length) {
-                        setTimeout(() => completionMessage.classList.add('show'), 500);
-                    }
-                }
+        // Sound effect placeholder (Visual pop is handled by CSS)
+        if (navigator.vibrate) navigator.vibrate(20);
+    }
 
-                function resetSelection(isIncorrect = true) {
-                    if (isIncorrect && selectedShape && selectedShape.element) {
-                        selectedShape.element.style.opacity = '1';
-                        selectedShape.element.style.pointerEvents = 'auto';
-                    }
-                    selectedShape = null;
-                    document.body.classList.remove('ghost-active');
-                }
+    handleWin() {
+        setTimeout(() => {
+            this.overlay.classList.add('visible');
+            this.fireConfetti();
+        }, 500);
+    }
 
-                function handleMouseMove(e) {
-                    if (document.body.classList.contains('ghost-active')) {
-                        cursorGhost.style.left = `${e.clientX}px`;
-                        cursorGhost.style.top = `${e.clientY}px`;
-                    }
-                }
+    nextLevel() {
+        this.loadLevel(this.levelIndex + 1);
+    }
 
-                function handleNextLevel() {
-                    if (isTransitioning) return; // [BUG-002] Redundant check for safety.
-                    nextLevelButton.disabled = true; // [BUG-002] Disable button immediately.
-                    const next = (currentLevel + 1) % levels.length;
-                    loadLevel(next);
-                }
+    fireConfetti() {
+        // Simple CSS/JS confetti implementation
+        const colors = ['#007AFF', '#FF2D55', '#34C759', '#FFCC00'];
+        for(let i=0; i<30; i++) {
+            const conf = document.createElement('div');
+            conf.style.position = 'fixed';
+            conf.style.left = '50%';
+            conf.style.top = '50%';
+            conf.style.width = '10px';
+            conf.style.height = '10px';
+            conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            conf.style.borderRadius = '2px';
+            conf.style.zIndex = '2000';
+            conf.style.pointerEvents = 'none';
+            document.body.appendChild(conf);
 
-                // [BUG-004] Add resize listener to prevent ghost desync.
-                function handleResize() {
-                    if(selectedShape) {
-                        resetSelection();
-                    }
-                }
-                
-                canvas.addEventListener('click', handleCanvasClick);
-                document.addEventListener('mousemove', handleMouseMove);
-                nextLevelButton.addEventListener('click', handleNextLevel);
-                window.addEventListener('resize', handleResize); // [BUG-004] Listener activated.
+            const angle = Math.random() * Math.PI * 2;
+            const velocity = 2 + Math.random() * 4;
+            const tx = Math.cos(angle) * velocity * 100;
+            const ty = Math.sin(angle) * velocity * 100;
+            const rotation = Math.random() * 720;
 
-                loadLevel(0);
+            const anim = conf.animate([
+                { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+                { transform: `translate(${tx}px, ${ty}px) rotate(${rotation}deg)`, opacity: 0 }
+            ], {
+                duration: 1000 + Math.random() * 500,
+                easing: 'cubic-bezier(0, .9, .57, 1)'
             });
-        })();
-    </script>
+
+            anim.onfinish = () => conf.remove();
+        }
+    }
+}
+
+// Start Game
+document.addEventListener('DOMContentLoaded', () => {
+    new Game();
+});
+
+})();
+</script>
 </body>
 </html>
