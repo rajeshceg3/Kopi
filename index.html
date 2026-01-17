@@ -11,32 +11,37 @@
     <style>
         :root {
             /* World Class Color Palette */
-            --bg-gradient: radial-gradient(120% 120% at 50% 100%, #f0f2f5 0%, #ffffff 100%);
+            --bg-primary: #f5f5f7;
+            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --text-primary: #1d1d1f;
             --text-secondary: #86868b;
 
+            /* Vibrant, Tactile Colors */
             --color-blue: #007AFF;
             --color-pink: #FF2D55;
             --color-green: #34C759;
             --color-yellow: #FFCC00;
+            --color-shadow: rgba(0, 0, 0, 0.15);
 
-            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04);
-            --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
-            --shadow-lg: 0 16px 40px rgba(0,0,0,0.12);
+            --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
+            --shadow-md: 0 12px 32px rgba(0,0,0,0.1);
+            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+            --shadow-inner: inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.05);
 
             --radius-md: 16px;
-            --radius-lg: 24px;
+            --radius-lg: 32px;
             --radius-full: 999px;
 
             --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1.0);
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #ffffff;
             color: var(--text-primary);
             margin: 0;
             height: 100vh;
@@ -45,7 +50,27 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            touch-action: none; /* Prevent scroll on mobile */
+            touch-action: none;
+        }
+
+        /* Subtle animated background mesh */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            background: radial-gradient(circle at 50% 10%, rgba(0,122,255,0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 60%, rgba(255,45,85,0.08) 0%, transparent 40%),
+                        radial-gradient(circle at 10% 70%, rgba(52,199,89,0.08) 0%, transparent 40%);
+            top: -20%;
+            left: -20%;
+            z-index: -1;
+            animation: floatBg 20s ease-in-out infinite alternate;
+        }
+
+        @keyframes floatBg {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-2%, 2%) scale(1.05); }
         }
 
         /* Layout Container */
@@ -55,7 +80,7 @@
             max-width: 600px;
             display: flex;
             flex-direction: column;
-            padding: 20px;
+            padding: 24px;
             position: relative;
         }
 
@@ -64,28 +89,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 4px;
-            margin-bottom: 10px;
+            padding: 12px 4px;
+            margin-bottom: 16px;
             z-index: 10;
         }
 
         .logo {
-            font-size: 28px;
-            font-weight: 600;
-            letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            color: var(--text-primary);
+            opacity: 0.9;
         }
 
         .level-badge {
-            background: rgba(0, 0, 0, 0.05);
-            padding: 6px 14px;
+            background: rgba(255, 255, 255, 0.5);
+            padding: 8px 16px;
             border-radius: var(--radius-full);
             font-size: 14px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            backdrop-filter: blur(10px);
+            font-weight: 600;
+            color: var(--text-primary);
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm);
+            letter-spacing: -0.3px;
+            transition: transform 0.3s var(--ease-spring);
         }
 
         /* Game Area */
@@ -97,46 +124,50 @@
             align-items: center;
             width: 100%;
             position: relative;
+            /* Provide some padding for the floating elements */
+            padding: 20px 0;
         }
 
         .canvas-container {
             width: 100%;
-            max-width: 400px; /* Optimal play size */
+            max-width: 420px;
             aspect-ratio: 1;
-            background: rgba(255, 255, 255, 0.6);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
             border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(255,255,255,0.5);
+            box-shadow: var(--shadow-md), inset 0 0 0 1px rgba(255,255,255,0.6);
             position: relative;
             overflow: hidden;
-            transition: transform 0.3s var(--ease-smooth);
+            transition: transform 0.4s var(--ease-smooth);
         }
 
-        /* Mobile Optimization: Use available space but keep aspect ratio */
-        @media (max-width: 450px) {
-            .canvas-container {
-                width: 90vw;
-            }
+        /* Mobile Optimization */
+        @media (max-width: 480px) {
+            .app-container { padding: 16px; }
+            .canvas-container { width: 92vw; border-radius: 28px; }
+            .palette { border-radius: 28px; gap: 16px; padding: 16px; }
         }
 
         /* Palette (Dock) */
         .palette {
             margin-top: auto;
             width: 100%;
-            min-height: 100px;
-            background: rgba(255, 255, 255, 0.8);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
+            min-height: 110px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
             border-radius: var(--radius-lg);
-            padding: 20px;
+            padding: 24px;
             display: flex;
+            align-items: center;
             justify-content: center;
             gap: 24px;
-            box-shadow: var(--shadow-lg);
+            box-shadow: var(--shadow-lg), inset 0 0 0 1px rgba(255,255,255,0.5);
             position: relative;
             z-index: 20;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            transition: transform 0.3s ease;
         }
 
         /* Shapes */
@@ -148,77 +179,95 @@
             /* Default transform for centering if needed, but we position by top/left % */
         }
 
-        /* Shape Rendering using Clip Path for smoother edges and hardware accel */
+        /* Shape Rendering */
         .shape-render {
             width: 100%;
             height: 100%;
-            border-radius: 14px; /* Default for square */
-            transition: transform 0.3s var(--ease-elastic), opacity 0.2s ease;
-            box-shadow: inset 0 -4px 4px rgba(0,0,0,0.1); /* Subtle depth */
+            border-radius: 18px;
+            transition: transform 0.4s var(--ease-elastic), opacity 0.2s ease, filter 0.2s ease;
+            box-shadow: var(--shadow-inner);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Add a subtle sheen to shapes */
+        .shape-render::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);
+            pointer-events: none;
         }
 
         .shape.in-palette {
             position: relative;
             cursor: grab;
             touch-action: none;
+            transition: transform 0.2s var(--ease-spring);
+        }
+
+        .shape.in-palette:hover {
+            transform: translateY(-4px) scale(1.05);
         }
 
         .shape.in-palette:active {
             cursor: grabbing;
+            transform: scale(0.95);
         }
 
         .shape.in-palette .shape-render {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 -4px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.15), var(--shadow-inner);
         }
 
         .shape.in-palette.dragging {
-            opacity: 0.3;
+            opacity: 0.2;
+            transform: scale(0.9);
+            filter: grayscale(0.5);
         }
 
         /* Shape Types */
         .type-circle .shape-render { border-radius: 50%; }
 
         .type-triangle .shape-render {
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            clip-path: polygon(50% 5%, 5% 90%, 95% 90%);
             border-radius: 0;
-            padding-bottom: 10%; /* Visual adjustment */
+            box-shadow: none;
+            /* Use filter for drop shadow on clipped shapes */
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+        }
+        /* Triangle sheen fix */
+        .type-triangle .shape-render::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
         }
 
-        /* Colors */
-        .color-blue .shape-render { background: var(--color-blue); }
-        .color-pink .shape-render { background: var(--color-pink); }
-        .color-green .shape-render { background: var(--color-green); }
-        .color-yellow .shape-render { background: var(--color-yellow); }
+        /* Colors with slight gradient for depth */
+        .color-blue .shape-render { background: linear-gradient(145deg, #2b95ff, #0066d6); }
+        .color-pink .shape-render { background: linear-gradient(145deg, #ff5274, #e01640); }
+        .color-green .shape-render { background: linear-gradient(145deg, #5ddb7d, #24b348); }
+        .color-yellow .shape-render { background: linear-gradient(145deg, #ffd633, #eebb00); }
 
         /* Targets */
         .target {
             position: absolute;
             width: 64px;
             height: 64px;
-            opacity: 0.4;
+            opacity: 1; /* Handle opacity in children */
             transform-origin: center;
+            transition: transform 0.3s var(--ease-smooth);
         }
 
         .target .shape-render {
-            background: transparent;
-            border: 3px dashed #c7c7cc;
-            box-shadow: none;
+            background: rgba(0,0,0,0.04);
+            box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+            border: 2px solid rgba(0,0,0,0.05);
         }
 
-        /* Triangle Target fix: borders don't work well with clip-path, so use SVG or a trick.
-           Let's use a pseudo-element or SVG for targets for perfect dashed lines.
-           Actually, for simplicity and slickness, let's use a semi-transparent filled target.
-        */
-        .target .shape-render {
-            background: rgba(0,0,0,0.06);
-            border: none;
-            /* If we want dashed border, it's hard with clip-path.
-               Filled low-opacity is modern and clean. */
-        }
+        .target .shape-render::after { display: none; } /* No sheen on targets */
 
         .target.highlight .shape-render {
-            background: rgba(0,0,0,0.12);
-            transform: scale(1.05);
+            background: rgba(0,0,0,0.08);
+            border-color: rgba(0,0,0,0.1);
+            transform: scale(1.1);
         }
 
         /* Placed Shape */
@@ -387,6 +436,9 @@ class Game {
         this.dragGhost = null; // The floating element
         this.dragData = null; // Shape data
 
+        // Idle Timer
+        this.idleTimer = null;
+
         this.init();
     }
 
@@ -398,6 +450,41 @@ class Game {
         window.addEventListener('pointermove', (e) => this.onPointerMove(e));
         window.addEventListener('pointerup', (e) => this.onPointerUp(e));
         window.addEventListener('pointercancel', (e) => this.onPointerUp(e));
+
+        // Reset idle timer on interaction
+        ['pointerdown', 'pointermove', 'keydown'].forEach(evt => {
+            window.addEventListener(evt, () => this.resetIdleTimer());
+        });
+
+        this.resetIdleTimer();
+    }
+
+    resetIdleTimer() {
+        clearTimeout(this.idleTimer);
+        this.idleTimer = setTimeout(() => this.showHint(), 6000); // 6 seconds idle
+    }
+
+    showHint() {
+        // Find a shape in the palette that corresponds to an empty target
+        const targets = Array.from(this.canvas.querySelectorAll('.target:not(.filled)'));
+        if (targets.length === 0) return;
+
+        // Pick one target
+        const target = targets[0];
+        const targetId = parseInt(target.dataset.id);
+
+        // Find matching shape in palette (by iterating data-shape)
+        const paletteItems = Array.from(this.palette.children);
+        const match = paletteItems.find(item => {
+            if(!item.dataset.shape) return false;
+            const data = JSON.parse(item.dataset.shape);
+            return data.id === targetId;
+        });
+
+        if (match) {
+            match.classList.add('shake-element');
+            setTimeout(() => match.classList.remove('shake-element'), 500);
+        }
     }
 
     loadLevel(index) {
@@ -470,8 +557,11 @@ class Game {
         this.dragItem = element;
         this.dragData = data;
 
+        // Determine if touch or mouse for offset
+        this.isTouch = e.pointerType === 'touch';
+
         // Haptic feedback if available
-        if (navigator.vibrate) navigator.vibrate(10);
+        if (navigator.vibrate) navigator.vibrate(12);
 
         // Create Ghost
         this.dragGhost = element.cloneNode(true);
@@ -502,7 +592,12 @@ class Game {
     }
 
     updateGhostPosition(x, y) {
-        this.dragGhost.style.transform = `translate(${x}px, ${y}px)`;
+        // Offset for visibility on mobile
+        let offsetY = 0;
+        if (this.isTouch) {
+            offsetY = -70; // Lift finger above shape
+        }
+        this.dragGhost.style.transform = `translate(${x}px, ${y + offsetY}px)`;
     }
 
     checkHover(x, y) {
@@ -624,37 +719,51 @@ class Game {
     }
 
     fireConfetti() {
-        // Simple CSS/JS confetti implementation
-        const colors = ['#007AFF', '#FF2D55', '#34C759', '#FFCC00'];
-        for(let i=0; i<30; i++) {
+        // High Quality Confetti
+        const colors = ['#007AFF', '#FF2D55', '#34C759', '#FFCC00', '#5856D6', '#FF9500'];
+        const particleCount = 60;
+
+        const createParticle = () => {
             const conf = document.createElement('div');
             conf.style.position = 'fixed';
             conf.style.left = '50%';
             conf.style.top = '50%';
-            conf.style.width = '10px';
-            conf.style.height = '10px';
+            conf.style.width = Math.random() > 0.5 ? '8px' : '12px';
+            conf.style.height = Math.random() > 0.5 ? '8px' : '6px';
             conf.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            conf.style.borderRadius = '2px';
+            conf.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
             conf.style.zIndex = '2000';
             conf.style.pointerEvents = 'none';
             document.body.appendChild(conf);
 
             const angle = Math.random() * Math.PI * 2;
-            const velocity = 2 + Math.random() * 4;
-            const tx = Math.cos(angle) * velocity * 100;
-            const ty = Math.sin(angle) * velocity * 100;
-            const rotation = Math.random() * 720;
+            const velocity = 3 + Math.random() * 6;
+            const tx = Math.cos(angle) * velocity * 120; // Spread radius
+            const ty = Math.sin(angle) * velocity * 120;
+            const rotation = Math.random() * 1080;
 
+            // Physics simulation (gravity)
             const anim = conf.animate([
                 { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
-                { transform: `translate(${tx}px, ${ty}px) rotate(${rotation}deg)`, opacity: 0 }
+                { transform: `translate(${tx}px, ${ty}px) rotate(${rotation * 0.5}deg)`, opacity: 1, offset: 0.6 },
+                { transform: `translate(${tx}px, ${ty + 150}px) rotate(${rotation}deg)`, opacity: 0 }
             ], {
-                duration: 1000 + Math.random() * 500,
-                easing: 'cubic-bezier(0, .9, .57, 1)'
+                duration: 1200 + Math.random() * 800,
+                easing: 'cubic-bezier(0.25, 1, 0.5, 1)'
             });
 
             anim.onfinish = () => conf.remove();
+        };
+
+        // Burst
+        for(let i=0; i<particleCount; i++) {
+            setTimeout(createParticle, Math.random() * 200);
         }
+
+        // Secondary burst
+        setTimeout(() => {
+             for(let i=0; i<particleCount/2; i++) createParticle();
+        }, 300);
     }
 }
 
