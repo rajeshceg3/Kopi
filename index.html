@@ -3,6 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#f5f5f7">
+    <meta name="description" content="A world-class shape matching puzzle game.">
     <title>Kopī</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -12,36 +16,39 @@
         :root {
             /* World Class Color Palette */
             --bg-primary: #f5f5f7;
-            --bg-gradient: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             --text-primary: #1d1d1f;
             --text-secondary: #86868b;
 
-            /* Vibrant, Tactile Colors */
+            /* Vibrant, Tactile Colors - P3 Gamut inspired */
             --color-blue: #007AFF;
             --color-pink: #FF2D55;
             --color-green: #34C759;
             --color-yellow: #FFCC00;
-            --color-shadow: rgba(0, 0, 0, 0.15);
 
-            --shadow-sm: 0 4px 12px rgba(0,0,0,0.06);
-            --shadow-md: 0 12px 32px rgba(0,0,0,0.1);
-            --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
-            --shadow-inner: inset 0 2px 4px rgba(255,255,255,0.3), inset 0 -2px 4px rgba(0,0,0,0.05);
+            /* Deep, layered shadows for depth */
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 12px 24px -6px rgba(0,0,0,0.08), 0 4px 8px -4px rgba(0,0,0,0.04);
+            --shadow-lg: 0 24px 48px -12px rgba(0,0,0,0.12), 0 12px 24px -8px rgba(0,0,0,0.04);
+            --shadow-float: 0 30px 60px -12px rgba(50, 50, 93, 0.25), 0 18px 36px -18px rgba(0, 0, 0, 0.3);
 
-            --radius-md: 16px;
-            --radius-lg: 32px;
+            --shadow-inner: inset 0 1px 1px rgba(255,255,255,0.5), inset 0 -2px 5px rgba(0,0,0,0.05);
+            --shadow-glass: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+
+            --radius-md: 20px;
+            --radius-lg: 36px;
             --radius-full: 999px;
 
+            /* Animation curves */
             --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
-            --ease-smooth: cubic-bezier(0.25, 0.1, 0.25, 1.0);
-            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --ease-smooth: cubic-bezier(0.2, 0.0, 0.2, 1.0);
+            --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.35);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; user-select: none; }
         
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #ffffff;
+            background: #f5f5f7;
             color: var(--text-primary);
             margin: 0;
             height: 100vh;
@@ -51,6 +58,19 @@
             align-items: center;
             justify-content: center;
             touch-action: none;
+            overscroll-behavior: none;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        /* Noise Texture for Texture/Premium Feel */
+        .noise-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9000;
+            opacity: 0.035;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
         }
 
         /* Subtle animated background mesh */
@@ -59,13 +79,15 @@
             position: absolute;
             width: 140%;
             height: 140%;
-            background: radial-gradient(circle at 50% 10%, rgba(0,122,255,0.08) 0%, transparent 40%),
-                        radial-gradient(circle at 90% 60%, rgba(255,45,85,0.08) 0%, transparent 40%),
-                        radial-gradient(circle at 10% 70%, rgba(52,199,89,0.08) 0%, transparent 40%);
+            background: radial-gradient(circle at 50% 10%, rgba(0,122,255,0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 60%, rgba(255,45,85,0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 10% 70%, rgba(52,199,89,0.06) 0%, transparent 40%),
+                        radial-gradient(circle at 80% 20%, rgba(255,204,0,0.05) 0%, transparent 30%);
             top: -20%;
             left: -20%;
             z-index: -1;
             animation: floatBg 20s ease-in-out infinite alternate;
+            will-change: transform;
         }
 
         @keyframes floatBg {
@@ -183,9 +205,10 @@
         .shape-render {
             width: 100%;
             height: 100%;
-            border-radius: 18px;
-            transition: transform 0.4s var(--ease-elastic), opacity 0.2s ease, filter 0.2s ease;
-            box-shadow: var(--shadow-inner);
+            /* Squircle approximation */
+            border-radius: 22%;
+            transition: transform 0.4s var(--ease-elastic), opacity 0.2s ease, filter 0.2s ease, box-shadow 0.3s ease;
+            box-shadow: var(--shadow-inner), 0 4px 6px rgba(0,0,0,0.05);
             position: relative;
             overflow: hidden;
         }
@@ -195,7 +218,7 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(135deg, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 50%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 100%);
             pointer-events: none;
         }
 
@@ -203,11 +226,19 @@
             position: relative;
             cursor: grab;
             touch-action: none;
-            transition: transform 0.2s var(--ease-spring);
+            transition: transform 0.3s var(--ease-spring);
+            z-index: 10;
         }
 
-        .shape.in-palette:hover {
-            transform: translateY(-4px) scale(1.05);
+        /* Desktop Hover: Juicy scale and tilt handled by CSS for initial feel */
+        @media (hover: hover) {
+            .shape.in-palette:hover {
+                transform: translateY(-8px) scale(1.1);
+                z-index: 20;
+            }
+            .shape.in-palette:hover .shape-render {
+                box-shadow: var(--shadow-float), var(--shadow-inner);
+            }
         }
 
         .shape.in-palette:active {
@@ -216,24 +247,23 @@
         }
 
         .shape.in-palette .shape-render {
-            box-shadow: 0 8px 16px rgba(0,0,0,0.15), var(--shadow-inner);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1), var(--shadow-inner);
         }
 
         .shape.in-palette.dragging {
-            opacity: 0.2;
-            transform: scale(0.9);
-            filter: grayscale(0.5);
+            opacity: 0.0; /* Fully hide original when dragging for better illusion */
         }
 
         /* Shape Types */
         .type-circle .shape-render { border-radius: 50%; }
 
         .type-triangle .shape-render {
-            clip-path: polygon(50% 5%, 5% 90%, 95% 90%);
+            clip-path: polygon(50% 10%, 10% 85%, 90% 85%);
             border-radius: 0;
             box-shadow: none;
+            background-color: transparent !important; /* Fix for bg bleed */
             /* Use filter for drop shadow on clipped shapes */
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
         }
         /* Triangle sheen fix */
         .type-triangle .shape-render::after {
@@ -382,7 +412,7 @@
     </style>
 </head>
 <body>
-
+<div class="noise-overlay"></div>
 <div class="app-container">
     <header class="header">
         <div class="logo">Kopī</div>
@@ -418,11 +448,80 @@ const LEVELS = [
     { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }
 ];
 
+class SoundEngine {
+    constructor() {
+        this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        this.enabled = true;
+        this.masterGain = this.ctx.createGain();
+        this.masterGain.gain.value = 0.3; // Gentle volume
+        this.masterGain.connect(this.ctx.destination);
+    }
+
+    resume() {
+        if (this.ctx.state === 'suspended') this.ctx.resume();
+    }
+
+    playTone(freq, type, duration, startTime = 0) {
+        if (!this.enabled) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, this.ctx.currentTime + startTime);
+
+        gain.gain.setValueAtTime(0, this.ctx.currentTime + startTime);
+        gain.gain.linearRampToValueAtTime(1, this.ctx.currentTime + startTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + startTime + duration);
+
+        osc.connect(gain);
+        gain.connect(this.masterGain);
+
+        osc.start(this.ctx.currentTime + startTime);
+        osc.stop(this.ctx.currentTime + startTime + duration + 0.1);
+    }
+
+    play(sound) {
+        this.resume();
+        const now = this.ctx.currentTime;
+
+        switch (sound) {
+            case 'pickup':
+                // High blip
+                this.playTone(600, 'sine', 0.1);
+                this.playTone(800, 'sine', 0.1, 0.05);
+                break;
+            case 'hover':
+                // Subtle tick
+                this.playTone(400, 'triangle', 0.05);
+                break;
+            case 'drop_success':
+                // Harmonious Major Triad (C Majorish)
+                this.playTone(523.25, 'sine', 0.4); // C5
+                this.playTone(659.25, 'sine', 0.4, 0.05); // E5
+                this.playTone(783.99, 'sine', 0.6, 0.1); // G5
+                break;
+            case 'drop_fail':
+                // Dull thud
+                this.playTone(200, 'triangle', 0.2);
+                this.playTone(150, 'sine', 0.2, 0.05);
+                break;
+            case 'win':
+                // Arpeggio
+                [523.25, 659.25, 783.99, 1046.50, 1318.51].forEach((freq, i) => {
+                    this.playTone(freq, 'sine', 0.5, i * 0.08);
+                });
+                break;
+        }
+    }
+}
+
 class Game {
     constructor() {
         this.levelIndex = 0;
         this.currentLevel = null;
         this.placedCount = 0;
+
+        this.sound = new SoundEngine();
 
         // DOM Elements
         this.canvas = document.getElementById('game-canvas');
@@ -432,9 +531,16 @@ class Game {
         this.btnNext = document.getElementById('btn-next');
 
         // Drag State
-        this.dragItem = null; // The original element in palette
-        this.dragGhost = null; // The floating element
-        this.dragData = null; // Shape data
+        this.dragItem = null;
+        this.dragGhost = null;
+        this.dragData = null;
+        this.isDragging = false;
+
+        // Physics State
+        this.pointerPos = { x: 0, y: 0 };
+        this.ghostPos = { x: 0, y: 0 };
+        this.ghostVel = { x: 0, y: 0 };
+        this.targetSnap = null;
 
         // Idle Timer
         this.idleTimer = null;
@@ -443,13 +549,20 @@ class Game {
     }
 
     init() {
-        this.btnNext.addEventListener('click', () => this.nextLevel());
+        this.btnNext.addEventListener('click', () => {
+             this.sound.resume(); // Ensure audio context starts on user interaction
+             this.nextLevel();
+        });
+
         this.loadLevel(this.levelIndex);
 
         // Global Pointer Events for Dragging
         window.addEventListener('pointermove', (e) => this.onPointerMove(e));
         window.addEventListener('pointerup', (e) => this.onPointerUp(e));
         window.addEventListener('pointercancel', (e) => this.onPointerUp(e));
+
+        // Resume audio on first touch
+        window.addEventListener('pointerdown', () => this.sound.resume(), { once: true });
 
         // Reset idle timer on interaction
         ['pointerdown', 'pointermove', 'keydown'].forEach(evt => {
@@ -465,15 +578,12 @@ class Game {
     }
 
     showHint() {
-        // Find a shape in the palette that corresponds to an empty target
         const targets = Array.from(this.canvas.querySelectorAll('.target:not(.filled)'));
         if (targets.length === 0) return;
 
-        // Pick one target
         const target = targets[0];
         const targetId = parseInt(target.dataset.id);
 
-        // Find matching shape in palette (by iterating data-shape)
         const paletteItems = Array.from(this.palette.children);
         const match = paletteItems.find(item => {
             if(!item.dataset.shape) return false;
@@ -495,7 +605,6 @@ class Game {
         this.levelDisplay.textContent = `Level ${this.levelIndex + 1}`;
         this.overlay.classList.remove('visible');
 
-        // Clear board
         this.canvas.innerHTML = '';
         this.palette.innerHTML = '';
 
@@ -504,16 +613,8 @@ class Game {
             const el = document.createElement('div');
             el.className = `shape target type-${shape.type} color-${shape.color}`;
             el.dataset.id = shape.id;
-
-            // Positioning
             el.style.left = `${shape.x}%`;
             el.style.top = `${shape.y}%`;
-            // Center alignment fix (64px is hardcoded width, so we need to offset)
-            // But % is usually top-left. Let's assume % is coordinate of top-left.
-            // Wait, previous code had manual offsets.
-            // Let's refine: % should be center.
-            // Current CSS uses top/left directly.
-            // Let's stick to Top/Left as per data, but center the element visually using transform translate.
             el.style.transform = `translate(-50%, -50%) ${shape.rotation ? `rotate(${shape.rotation}deg)` : ''}`;
 
             const render = document.createElement('div');
@@ -523,7 +624,7 @@ class Game {
             this.canvas.appendChild(el);
         });
 
-        // Render Palette (Shuffled)
+        // Render Palette
         const shuffled = [...this.currentLevel.shapes].sort(() => Math.random() - 0.5);
         shuffled.forEach(shape => {
             const el = document.createElement('div');
@@ -534,130 +635,181 @@ class Game {
 
             const render = document.createElement('div');
             render.className = 'shape-render';
-            // Rotation in palette? Usually upright. Let's keep upright in palette.
-            if(shape.type === 'triangle' && shape.rotation) {
-                // visual adjustment only if needed, but usually icons are upright
-            }
             el.appendChild(render);
-
-            // Attach Data
             el.dataset.shape = JSON.stringify(shape);
-
-            // Event
             el.addEventListener('pointerdown', (e) => this.onDragStart(e, el, shape));
-
             this.palette.appendChild(el);
         });
     }
 
     onDragStart(e, element, data) {
-        e.preventDefault(); // Prevent scrolling/text selection
-        if(this.dragGhost) return; // Already dragging
+        e.preventDefault();
+        if(this.isDragging) return;
 
         this.dragItem = element;
         this.dragData = data;
+        this.isTouch = e.pointerType === 'touch' || (e.touches && e.touches.length > 0);
 
-        // Determine if touch or mouse for offset
-        this.isTouch = e.pointerType === 'touch';
+        this.pointerPos = { x: e.clientX, y: e.clientY };
+        this.ghostPos = { x: e.clientX, y: e.clientY };
+        this.ghostVel = { x: 0, y: 0 };
+        this.targetSnap = null;
 
-        // Haptic feedback if available
-        if (navigator.vibrate) navigator.vibrate(12);
+        if (navigator.vibrate) navigator.vibrate(10);
+        this.sound.play('pickup');
 
         // Create Ghost
         this.dragGhost = element.cloneNode(true);
         this.dragGhost.classList.remove('in-palette');
         this.dragGhost.classList.add('drag-ghost');
 
-        // Apply rotation if needed (to match what it will look like on canvas)
+        // Handle rotation visually on inner element if needed, preserve existing transform
         if (data.rotation) {
-             this.dragGhost.querySelector('.shape-render').style.transform = `rotate(${data.rotation}deg)`;
+             const render = this.dragGhost.querySelector('.shape-render');
+             if(render) render.style.transform = `rotate(${data.rotation}deg)`;
         }
 
         document.body.appendChild(this.dragGhost);
-
-        // Visual state
         this.dragItem.classList.add('dragging');
 
-        // Initial Position
-        this.updateGhostPosition(e.clientX, e.clientY);
+        this.isDragging = true;
+        this.dragLoop();
     }
 
     onPointerMove(e) {
-        if (!this.dragGhost) return;
+        if (!this.isDragging) return;
         e.preventDefault();
-        this.updateGhostPosition(e.clientX, e.clientY);
+        this.pointerPos.x = e.clientX;
+        this.pointerPos.y = e.clientY;
 
-        // Check for hover highlighting
-        this.checkHover(e.clientX, e.clientY);
+        // Check magnet
+        this.checkHover();
     }
 
-    updateGhostPosition(x, y) {
-        // Offset for visibility on mobile
-        let offsetY = 0;
-        if (this.isTouch) {
-            offsetY = -70; // Lift finger above shape
-        }
-        this.dragGhost.style.transform = `translate(${x}px, ${y + offsetY}px)`;
-    }
-
-    checkHover(x, y) {
-        // Simple hit testing for visual feedback
+    checkHover() {
         const targets = Array.from(this.canvas.querySelectorAll('.target'));
-        let hovered = null;
+        let closest = null;
+        let minDist = 60; // Snap radius
 
         targets.forEach(target => {
             const rect = target.getBoundingClientRect();
             const centerX = rect.left + rect.width / 2;
             const centerY = rect.top + rect.height / 2;
-            const dist = Math.hypot(x - centerX, y - centerY);
+            const dist = Math.hypot(this.pointerPos.x - centerX, this.pointerPos.y - centerY);
 
+            const wasHighlighted = target.classList.contains('highlight');
             target.classList.remove('highlight');
 
-            if (dist < 40 && target.dataset.id == this.dragData.id) { // Only highlight correct one
-                hovered = target;
+            if (dist < minDist && parseInt(target.dataset.id) === this.dragData.id && !target.classList.contains('filled')) {
+                closest = { el: target, x: centerX, y: centerY };
+                target.classList.add('highlight');
+
+                // Play sound on enter
+                if (!wasHighlighted) {
+                     this.sound.play('hover');
+                     if(navigator.vibrate) navigator.vibrate(5);
+                }
             }
         });
 
-        if (hovered) hovered.classList.add('highlight');
+        this.targetSnap = closest;
+    }
+
+    dragLoop() {
+        if(!this.isDragging) return;
+        requestAnimationFrame(() => this.dragLoop());
+
+        // Physics Constants
+        const spring = 0.15;
+        const damping = 0.75;
+
+        // Target: Mouse or Snap Center
+        let targetX = this.pointerPos.x;
+        let targetY = this.pointerPos.y;
+
+        // Mobile Offset
+        let visualOffsetY = this.isTouch ? -80 : 0;
+
+        if (this.targetSnap) {
+            targetX = this.targetSnap.x;
+            targetY = this.targetSnap.y;
+            // When snapped, remove mobile offset to show it locking in place?
+            // Or keep offset? Usually lock in place.
+            visualOffsetY = 0;
+        }
+
+        const forceX = (targetX - this.ghostPos.x) * spring;
+        const forceY = (targetY - (this.ghostPos.y - visualOffsetY)) * spring;
+
+        this.ghostVel.x = (this.ghostVel.x + forceX) * damping;
+        this.ghostVel.y = (this.ghostVel.y + forceY) * damping;
+
+        this.ghostPos.x += this.ghostVel.x;
+        this.ghostPos.y += this.ghostVel.y;
+
+        // Tilt based on horizontal velocity
+        const maxTilt = 20;
+        const tilt = Math.max(Math.min(this.ghostVel.x * 2.5, maxTilt), -maxTilt);
+
+        // Scale effect when snapped
+        const scale = this.targetSnap ? 1.0 : 1.15;
+
+        if(this.dragGhost) {
+            this.dragGhost.style.transform = `translate(${this.ghostPos.x}px, ${this.ghostPos.y}px) rotate(${tilt}deg) scale(${scale})`;
+        }
     }
 
     onPointerUp(e) {
-        if (!this.dragGhost) return;
+        if (!this.isDragging) return;
 
-        const dropped = this.attemptDrop(e.clientX, e.clientY);
+        this.isDragging = false; // Stop loop
+
+        // Drop logic: use the Magnet target if exists, otherwise mouse check
+        let dropped = false;
+
+        if (this.targetSnap) {
+             this.placeShape(this.targetSnap.el);
+             dropped = true;
+        } else {
+            dropped = this.attemptDrop(e.clientX, e.clientY);
+        }
 
         if (dropped) {
-            // Success
-            this.dragItem.remove(); // Remove from palette
-            this.dragGhost.remove(); // Remove ghost
+            this.dragItem.remove();
+            if(this.dragGhost) this.dragGhost.remove();
             this.placedCount++;
 
-            // Check Win
             if (this.placedCount === this.currentLevel.shapes.length) {
                 this.handleWin();
+            } else {
+                this.sound.play('drop_success');
             }
+            if (navigator.vibrate) navigator.vibrate(20);
         } else {
-            // Fail - Return to palette
             this.dragItem.classList.remove('dragging');
-            this.dragGhost.style.transition = 'transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s';
+            this.sound.play('drop_fail');
 
-            // Fly back animation could be complex, simple opacity fade is cleaner for now
-            this.dragGhost.style.opacity = '0';
+            // Animate fail back
+            if(this.dragGhost) {
+                this.dragGhost.style.transition = 'transform 0.4s var(--ease-spring), opacity 0.3s';
+                this.dragGhost.style.opacity = '0';
 
-            const ghostToRemove = this.dragGhost;
-            setTimeout(() => {
-                if(ghostToRemove) ghostToRemove.remove();
-            }, 300);
+                // Optional: Move it back to original rect? Too complex for now, fade out is fine.
+                // We could transform it to the palette position.
+                const rect = this.dragItem.getBoundingClientRect();
+                this.dragGhost.style.transform = `translate(${rect.left + 32}px, ${rect.top + 32}px) scale(0.5)`;
 
-            // Haptic
+                const ghost = this.dragGhost;
+                setTimeout(() => ghost.remove(), 400);
+            }
             if (navigator.vibrate) navigator.vibrate([10, 50, 10]);
         }
 
         this.dragItem = null;
         this.dragGhost = null;
         this.dragData = null;
+        this.targetSnap = null;
 
-        // Clear highlights
         document.querySelectorAll('.target.highlight').forEach(el => el.classList.remove('highlight'));
     }
 
@@ -677,8 +829,7 @@ class Game {
             if (dist < 40) {
                 // Check ID match
                 if (parseInt(target.dataset.id) === this.dragData.id) {
-                    this.placeShape(target);
-                    return true;
+                    return this.placeShape(target);
                 }
             }
         }
@@ -705,10 +856,13 @@ class Game {
 
         // Sound effect placeholder (Visual pop is handled by CSS)
         if (navigator.vibrate) navigator.vibrate(20);
+
+        return true;
     }
 
     handleWin() {
         setTimeout(() => {
+            this.sound.play('win');
             this.overlay.classList.add('visible');
             this.fireConfetti();
         }, 500);
