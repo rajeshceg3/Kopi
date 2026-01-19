@@ -7,6 +7,21 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f5f7">
     <meta name="description" content="A world-class shape matching puzzle game.">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://your-app-url.com/">
+    <meta property="og:title" content="Kopī">
+    <meta property="og:description" content="A world-class shape matching puzzle game.">
+    <meta property="og:image" content="https://your-app-url.com/kopi-og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://your-app-url.com/">
+    <meta property="twitter:title" content="Kopī">
+    <meta property="twitter:description" content="A world-class shape matching puzzle game.">
+    <meta property="twitter:image" content="https://your-app-url.com/kopi-og-image.png">
+
     <title>Kopī</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -117,11 +132,14 @@
         }
 
         .logo {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            color: var(--text-primary);
             opacity: 0.9;
+            height: 32px;
+        }
+
+        .logo svg {
+            height: 32px;
+            width: auto;
+            display: block;
         }
 
         .level-badge {
@@ -135,6 +153,64 @@
             box-shadow: var(--shadow-sm);
             letter-spacing: -0.3px;
             transition: transform 0.3s var(--ease-spring);
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s ease;
+            color: var(--text-secondary);
+        }
+
+        .control-btn:hover {
+            transform: scale(1.1);
+            color: var(--text-primary);
+        }
+
+        .control-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .tooltip {
+            position: relative;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 160px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 8px;
+            position: absolute;
+            z-index: 1;
+            bottom: 150%;
+            left: 50%;
+            margin-left: -80px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
         }
 
         /* Game Area */
@@ -415,8 +491,30 @@
 <div class="noise-overlay"></div>
 <div class="app-container">
     <header class="header">
-        <div class="logo">Kopī</div>
-        <div class="level-badge" id="level-display">Level 1</div>
+        <div class="logo">
+            <svg width="68" height="32" viewBox="0 0 68 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12.8359 0.9375C11.1094 0.9375 9.6875 1.34375 8.57031 2.15625C7.45312 2.96875 6.64062 4.04688 6.13281 5.39062C5.625 6.73438 5.37109 8.21875 5.37109 9.84375V22.1562C5.37109 23.7812 5.625 25.2656 6.13281 26.6094C6.64062 27.9531 7.45312 29.0312 8.57031 29.8438C9.6875 30.6562 11.1094 31.0625 12.8359 31.0625H14.1641V27.5312H12.8359C11.8906 27.5312 11.1406 27.25 10.5859 26.6875C10.0312 26.125 9.75391 25.2812 9.75391 24.1562V7.84375C9.75391 6.71875 10.0312 5.875 10.5859 5.3125C11.1406 4.75 11.8906 4.46875 12.8359 4.46875H14.1641V0.9375H12.8359Z" fill="#1D1D1F"/>
+                <path d="M26.2483 0.9375C24.3108 0.9375 22.764 1.48438 21.6077 2.57812C20.4514 3.67188 19.8733 5.17188 19.8733 7.07812V24.9219C19.8733 26.8281 20.4514 28.3281 21.6077 29.4219C22.764 30.5156 24.3108 31.0625 26.2483 31.0625C28.1858 31.0625 29.7327 30.5156 30.889 29.4219C32.0452 28.3281 32.6233 26.8281 32.6233 24.9219V7.07812C32.6233 5.17188 32.0452 3.67188 30.889 2.57812C29.7327 1.48438 28.1858 0.9375 26.2483 0.9375ZM26.2483 4.46875C27.1936 4.46875 27.928 4.75 28.4514 5.3125C28.9749 5.875 29.2366 6.71875 29.2366 7.84375V24.1562C29.2366 25.2812 28.9749 26.125 28.4514 26.6875C27.928 27.25 27.1936 27.5312 26.2483 27.5312C25.303 27.5312 24.5686 27.25 24.0452 26.6875C23.5217 26.125 23.26 25.2812 23.26 24.1562V7.84375C23.26 6.71875 23.5217 5.875 24.0452 5.3125C24.5686 4.75 25.303 4.46875 26.2483 4.46875Z" fill="#1D1D1F"/>
+                <path d="M40.9167 4.46875H44.6042V21.4375L52.8854 4.46875H57.1771L48.8125 21.625V31H44.6042V21.5L40.9167 4.46875Z" fill="#1D1D1F"/>
+                <path d="M60.6719 0.9375V31H64.9219V0.9375H60.6719Z" fill="#1D1D1F"/>
+            </svg>
+        </div>
+        <div class="header-controls">
+            <div class="level-badge" id="level-display">Level 1</div>
+            <button class="control-btn" id="reset-btn" aria-label="Reset Level">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M4.755 4.755a.75.75 0 011.06 0l1.673 1.673c1.332-1.331 3.16-2.178 5.132-2.178 4.08 0 7.447 3.367 7.447 7.447s-3.367 7.447-7.447 7.447-7.447-3.367-7.447-7.447c0-1.972.847-3.8 2.178-5.132L5.815 5.815a.75.75 0 010-1.06zm9.293 2.245a.75.75 0 01.191 1.045l-3.528 4.63a.75.75 0 01-1.142-.08L7.02 9.5a.75.75 0 111.218-.894l1.623 2.206 2.923-3.842a.75.75 0 011.045-.191z"></path></svg>
+            </button>
+            <button class="control-btn" id="sound-toggle-btn" aria-label="Toggle Sound">
+                <svg id="sound-on-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14.764 2.236a.75.75 0 00-.764.132L8.536 7.5H4.75A2.25 2.25 0 002.5 9.75v4.5A2.25 2.25 0 004.75 16.5h3.786l5.464 5.132a.75.75 0 001.132-.884L14.5 12 15.132 2.75a.75.75 0 00-.368-.514zM16.5 7.969a.75.75 0 00-1.06 1.06 3 3 0 010 6A.75.75 0 1016.5 16a4.5 4.5 0 000-8.03z"></path><path d="M18.803 5.697a.75.75 0 00-1.06 1.061 6 6 0 010 10.5a.75.75 0 101.06 1.06 7.5 7.5 0 000-12.622z"></path></svg>
+                <svg id="sound-off-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="display: none;"><path d="M14.764 2.236a.75.75 0 00-.764.132L8.536 7.5H4.75A2.25 2.25 0 002.5 9.75v4.5A2.25 2.25 0 004.75 16.5h3.786l5.464 5.132a.75.75 0 001.132-.884L14.5 12 15.132 2.75a.75.75 0 00-.368-.514z"></path><path d="M19.58 12.83a.75.75 0 01-1.06 1.06l-1.61-1.61-1.61 1.61a.75.75 0 11-1.06-1.06l1.61-1.61-1.61-1.61a.75.75 0 111.06-1.06l1.61 1.61 1.61-1.61a.75.75 0 111.06 1.06l-1.61 1.61 1.61 1.61z"></path></svg>
+            </button>
+            <div class="tooltip">
+                <button class="control-btn" id="help-btn" aria-label="Help">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zm0 1.5a8.25 8.25 0 100 16.5 8.25 8.25 0 000-16.5zM12 10.5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5a.75.75 0 01.75-.75zM12 8.25a.75.75 0 110-1.5.75.75 0 010 1.5z"></path></svg>
+                </button>
+                <span class="tooltip-text">Drag the shapes from the bottom palette to their matching targets.</span>
+            </div>
+        </div>
     </header>
 
     <div class="game-area">
@@ -445,8 +543,15 @@
 const LEVELS = [
     { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] },
     { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] },
-    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }
+    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] },
+    { shapes: [{ id: 1, type: 'triangle', color: 'green', x: 50, y: 25, rotation: 0 }, { id: 2, type: 'triangle', color: 'green', x: 50, y: 65, rotation: 180 }, { id: 3, type: 'square', color: 'yellow', x: 25, y: 45 }, { id: 4, type: 'square', color: 'pink', x: 75, y: 45 }] },
+    { shapes: [{ id: 1, type: 'circle', color: 'blue', x: 50, y: 50 }, { id: 2, type: 'square', color: 'pink', x: 50, y: 20 }, { id: 3, type: 'square', color: 'pink', x: 50, y: 80 }, { id: 4, type: 'square', color: 'pink', x: 20, y: 50 }, { id: 5, type: 'square', color: 'pink', x: 80, y: 50 }] },
+    { shapes: [{ id: 1, type: 'triangle', color: 'yellow', x: 50, y: 50, rotation: 60 }, { id: 2, type: 'triangle', color: 'yellow', x: 50, y: 50, rotation: 180 }, { id: 3, type: 'triangle', color: 'yellow', x: 50, y: 50, rotation: 300 }] },
+    { shapes: [{ id: 1, type: 'square', color: 'green', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 80, y: 20 }, { id: 3, type: 'square', color: 'pink', x: 20, y: 80 }, { id: 4, type: 'square', color: 'yellow', x: 80, y: 80 }, { id: 5, type: 'circle', color: 'blue', x: 50, y: 50 }] },
+    { shapes: [{ id: 1, type: 'circle', color: 'pink', x: 25, y: 25 }, { id: 2, type: 'circle', color: 'pink', x: 75, y: 25 }, { id: 3, type: 'circle', color: 'pink', x: 25, y: 75 }, { id: 4, type: 'circle', color: 'pink', x: 75, y: 75 }, { id: 5, type: 'square', color: 'green', x: 50, y: 50 }, { id: 6, type: 'triangle', color: 'blue', x: 50, y: 25, rotation: 180 }, { id: 7, type: 'triangle', color: 'blue', x: 50, y: 75, rotation: 0 }] }
 ];
+
+const COMPLETION_MESSAGES = ['Perfect', 'Brilliant', 'Fantastic', 'Well Done', 'Amazing', 'Superb'];
 
 class SoundEngine {
     constructor() {
@@ -459,6 +564,12 @@ class SoundEngine {
 
     resume() {
         if (this.ctx.state === 'suspended') this.ctx.resume();
+    }
+
+    toggle() {
+        this.enabled = !this.enabled;
+        this.masterGain.gain.setValueAtTime(this.enabled ? 0.3 : 0, this.ctx.currentTime);
+        return this.enabled;
     }
 
     playTone(freq, type, duration, startTime = 0) {
@@ -528,7 +639,12 @@ class Game {
         this.palette = document.getElementById('palette');
         this.levelDisplay = document.getElementById('level-display');
         this.overlay = document.getElementById('completion-overlay');
+        this.completionText = this.overlay.querySelector('h2');
         this.btnNext = document.getElementById('btn-next');
+        this.soundToggleBtn = document.getElementById('sound-toggle-btn');
+        this.soundOnIcon = document.getElementById('sound-on-icon');
+        this.soundOffIcon = document.getElementById('sound-off-icon');
+        this.resetBtn = document.getElementById('reset-btn');
 
         // Drag State
         this.dragItem = null;
@@ -552,6 +668,16 @@ class Game {
         this.btnNext.addEventListener('click', () => {
              this.sound.resume(); // Ensure audio context starts on user interaction
              this.nextLevel();
+        });
+
+        this.soundToggleBtn.addEventListener('click', () => {
+            const isEnabled = this.sound.toggle();
+            this.soundOnIcon.style.display = isEnabled ? 'block' : 'none';
+            this.soundOffIcon.style.display = isEnabled ? 'none' : 'block';
+        });
+
+        this.resetBtn.addEventListener('click', () => {
+            this.loadLevel(this.levelIndex);
         });
 
         this.loadLevel(this.levelIndex);
@@ -862,6 +988,8 @@ class Game {
 
     handleWin() {
         setTimeout(() => {
+            const message = COMPLETION_MESSAGES[Math.floor(Math.random() * COMPLETION_MESSAGES.length)];
+            this.completionText.textContent = message;
             this.sound.play('win');
             this.overlay.classList.add('visible');
             this.fireConfetti();
