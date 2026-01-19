@@ -6,8 +6,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="A world-class shape matching puzzle game.">
+    <meta name="description" content="A world-class shape matching puzzle game. Immerse yourself in a relaxing, high-fidelity experience.">
+    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness">
+
+    <!-- Social & Open Graph -->
+    <meta property="og:title" content="Kopī - A Shape Matching Experience">
+    <meta property="og:description" content="Immerse yourself in a world of shapes and colors. A relaxing, high-fidelity puzzle game for your mind.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Kopī">
+    <meta name="twitter:description" content="A relaxing, high-fidelity puzzle game.">
+
     <title>Kopī</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='8' y='8' width='40' height='40' rx='10' fill='%23007AFF' /%3E%3Ccircle cx='44' cy='44' r='18' fill='%23FF2D55' /%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -155,6 +166,9 @@
             max-width: 420px;
             aspect-ratio: 1;
             background: rgba(255, 255, 255, 0.45);
+            /* Subtle dot pattern */
+            background-image: radial-gradient(rgba(0,0,0,0.06) 1.5px, transparent 1.5px);
+            background-size: 24px 24px;
             backdrop-filter: blur(40px) saturate(180%);
             -webkit-backdrop-filter: blur(40px) saturate(180%);
             border-radius: var(--radius-lg);
@@ -190,6 +204,17 @@
             z-index: 20;
             margin-bottom: 24px;
             transition: transform 0.3s ease;
+        }
+
+        /* Empty State for Palette */
+        .palette:empty::after {
+            content: 'All Placed';
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            opacity: 0.5;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
 
         /* Shapes */
@@ -357,7 +382,7 @@
 
         .overlay h2 {
             font-size: 32px;
-            margin: 0 0 20px 0;
+            margin: 0 0 8px 0;
             background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -369,6 +394,51 @@
         .overlay.visible h2 {
             transform: translateY(0);
             opacity: 1;
+        }
+
+        .star-rating {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.6s var(--ease-spring) 0.2s;
+        }
+
+        .overlay.visible .star-rating {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .star {
+            font-size: 28px;
+            color: #FFCC00;
+            filter: drop-shadow(0 2px 4px rgba(255, 204, 0, 0.3));
+            animation: starPop 0.4s var(--ease-elastic) backwards;
+        }
+
+        .overlay.visible .star:nth-child(1) { animation-delay: 0.3s; }
+        .overlay.visible .star:nth-child(2) { animation-delay: 0.4s; }
+        .overlay.visible .star:nth-child(3) { animation-delay: 0.5s; }
+
+        @keyframes starPop {
+            0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .level-stats {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+            font-weight: 500;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease 0.4s;
+        }
+
+        .overlay.visible .level-stats {
+            opacity: 1;
+            transform: translateY(0);
         }
 
         .btn-next {
@@ -409,6 +479,26 @@
             animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
         }
 
+        .tutorial-hint {
+            position: absolute;
+            bottom: 24px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+
+        .tutorial-hint.visible {
+            opacity: 0.8;
+            transform: translateY(0);
+        }
+
     </style>
 </head>
 <body>
@@ -423,8 +513,14 @@
         <div class="canvas-container" id="canvas-container">
             <div id="game-canvas" style="width: 100%; height: 100%; position: relative;"></div>
 
+            <div class="tutorial-hint" id="tutorial-hint">Drag shapes to match</div>
+
             <div class="overlay" id="completion-overlay">
-                <h2>Perfect</h2>
+                <h2 id="win-title">Perfect</h2>
+                <div class="star-rating">
+                    <div class="star">★</div><div class="star">★</div><div class="star">★</div>
+                </div>
+                <div class="level-stats" id="win-stats">Excellent Flow</div>
                 <button class="btn-next" id="btn-next">Continue</button>
             </div>
         </div>
@@ -443,9 +539,76 @@
 
 (() => {
 const LEVELS = [
-    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 40 }, { id: 2, type: 'circle', color: 'pink', x: 65, y: 40 }] },
-    { shapes: [{ id: 1, type: 'square', color: 'green', x: 25, y: 20 }, { id: 2, type: 'circle', color: 'yellow', x: 60, y: 60 }, { id: 3, type: 'triangle', color: 'blue', x: 25, y: 60, rotation: 0 }] },
-    { shapes: [{ id: 1, type: 'square', color: 'blue', x: 20, y: 20 }, { id: 2, type: 'square', color: 'blue', x: 68, y: 20 }, { id: 3, type: 'circle', color: 'pink', x: 44, y: 44 }, { id: 4, type: 'triangle', color: 'yellow', x: 44, y: 68, rotation: 180 }] }
+    {
+        title: "The Beginning",
+        shapes: [
+            { id: 1, type: 'square', color: 'blue', x: 30, y: 50 },
+            { id: 2, type: 'circle', color: 'pink', x: 70, y: 50 }
+        ]
+    },
+    {
+        title: "Balance",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'green', x: 50, y: 30, rotation: 0 },
+            { id: 2, type: 'square', color: 'yellow', x: 30, y: 70 },
+            { id: 3, type: 'circle', color: 'blue', x: 70, y: 70 }
+        ]
+    },
+    {
+        title: "Reflection",
+        shapes: [
+            { id: 1, type: 'square', color: 'pink', x: 25, y: 25 },
+            { id: 2, type: 'square', color: 'pink', x: 75, y: 75 },
+            { id: 3, type: 'circle', color: 'green', x: 75, y: 25 },
+            { id: 4, type: 'circle', color: 'green', x: 25, y: 75 }
+        ]
+    },
+    {
+        title: "Ascension",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'yellow', x: 50, y: 20, rotation: 0 },
+            { id: 2, type: 'triangle', color: 'blue', x: 50, y: 50, rotation: 180 },
+            { id: 3, type: 'triangle', color: 'pink', x: 50, y: 80, rotation: 0 }
+        ]
+    },
+    {
+        title: "Chaos",
+        shapes: [
+            { id: 1, type: 'circle', color: 'blue', x: 20, y: 20 },
+            { id: 2, type: 'circle', color: 'yellow', x: 80, y: 80 },
+            { id: 3, type: 'square', color: 'green', x: 80, y: 20 },
+            { id: 4, type: 'square', color: 'pink', x: 20, y: 80 },
+            { id: 5, type: 'triangle', color: 'blue', x: 50, y: 50, rotation: 45 }
+        ]
+    },
+    {
+        title: "Alignment",
+        shapes: [
+            { id: 1, type: 'square', color: 'yellow', x: 20, y: 50 },
+            { id: 2, type: 'triangle', color: 'pink', x: 40, y: 50, rotation: 90 },
+            { id: 3, type: 'circle', color: 'green', x: 60, y: 50 },
+            { id: 4, type: 'square', color: 'blue', x: 80, y: 50 }
+        ]
+    },
+    {
+        title: "Zenith",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'green', x: 50, y: 25, rotation: 0 },
+            { id: 2, type: 'triangle', color: 'green', x: 30, y: 60, rotation: -45 },
+            { id: 3, type: 'triangle', color: 'green', x: 70, y: 60, rotation: 45 },
+            { id: 4, type: 'circle', color: 'yellow', x: 50, y: 50 }
+        ]
+    },
+    {
+        title: "Harmony",
+        shapes: [
+            { id: 1, type: 'square', color: 'blue', x: 35, y: 35 },
+            { id: 2, type: 'square', color: 'pink', x: 65, y: 65 },
+            { id: 3, type: 'circle', color: 'yellow', x: 65, y: 35 },
+            { id: 4, type: 'circle', color: 'green', x: 35, y: 65 },
+            { id: 5, type: 'triangle', color: 'blue', x: 50, y: 50, rotation: 180 }
+        ]
+    }
 ];
 
 class SoundEngine {
@@ -529,6 +692,9 @@ class Game {
         this.levelDisplay = document.getElementById('level-display');
         this.overlay = document.getElementById('completion-overlay');
         this.btnNext = document.getElementById('btn-next');
+        this.tutorialHint = document.getElementById('tutorial-hint');
+        this.winTitle = document.getElementById('win-title');
+        this.winStats = document.getElementById('win-stats');
 
         // Drag State
         this.dragItem = null;
@@ -602,8 +768,15 @@ class Game {
         this.currentLevel = LEVELS[this.levelIndex % LEVELS.length];
         this.placedCount = 0;
 
-        this.levelDisplay.textContent = `Level ${this.levelIndex + 1}`;
+        this.levelDisplay.textContent = `Level ${this.levelIndex + 1} • ${this.currentLevel.title || 'Puzzle'}`;
         this.overlay.classList.remove('visible');
+
+        // Tutorial Logic
+        if (this.levelIndex === 0) {
+            this.tutorialHint.classList.add('visible');
+        } else {
+            this.tutorialHint.classList.remove('visible');
+        }
 
         this.canvas.innerHTML = '';
         this.palette.innerHTML = '';
@@ -671,6 +844,7 @@ class Game {
 
         document.body.appendChild(this.dragGhost);
         this.dragItem.classList.add('dragging');
+        this.tutorialHint.classList.remove('visible'); // Hide hint on interaction
 
         this.isDragging = true;
         this.dragLoop();
@@ -854,6 +1028,9 @@ class Game {
         target.style.opacity = 0;
         target.classList.add('filled');
 
+        // Check if palette is empty to show state?
+        // Actually, we remove items from palette.
+
         // Sound effect placeholder (Visual pop is handled by CSS)
         if (navigator.vibrate) navigator.vibrate(20);
 
@@ -861,6 +1038,13 @@ class Game {
     }
 
     handleWin() {
+        // Random praise
+        const phrases = ["Perfect", "Sublime", "Magnificent", "Beautiful", "Geometric Harmony", "Outstanding"];
+        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
+
+        this.winTitle.textContent = phrase;
+        this.winStats.textContent = `Completed Level ${this.levelIndex + 1}`;
+
         setTimeout(() => {
             this.sound.play('win');
             this.overlay.classList.add('visible');
