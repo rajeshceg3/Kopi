@@ -127,6 +127,12 @@
             z-index: 10;
         }
 
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
         .logo {
             font-size: 32px;
             font-weight: 700;
@@ -146,6 +152,32 @@
             box-shadow: var(--shadow-sm);
             letter-spacing: -0.3px;
             transition: transform 0.3s var(--ease-spring);
+        }
+
+        .btn-sound {
+            background: rgba(255, 255, 255, 0.5);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-sm);
+            color: var(--text-secondary);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-sound:active {
+            transform: scale(0.9);
+        }
+
+        .btn-sound svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
         }
 
         /* Game Area */
@@ -215,6 +247,24 @@
             opacity: 0.5;
             letter-spacing: 0.5px;
             text-transform: uppercase;
+        }
+
+        /* Palette Slots */
+        .palette-slot {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            background: rgba(0,0,0,0.03);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            position: relative;
+        }
+
+        .palette-slot::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            border: 1px dashed rgba(0,0,0,0.1);
         }
 
         /* Shapes */
@@ -441,6 +491,20 @@
             transform: translateY(0);
         }
 
+        .overlay-controls {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            transform: translateY(20px);
+            opacity: 0;
+            transition: all 0.5s var(--ease-smooth) 0.1s;
+        }
+
+        .overlay.visible .overlay-controls {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
         .btn-next {
             background: var(--text-primary);
             color: white;
@@ -451,9 +515,7 @@
             border-radius: var(--radius-full);
             cursor: pointer;
             box-shadow: 0 8px 20px rgba(0,0,0,0.2);
-            transform: translateY(20px);
-            opacity: 0;
-            transition: all 0.5s var(--ease-smooth) 0.1s;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         
         .btn-next:hover {
@@ -461,11 +523,28 @@
             box-shadow: 0 12px 24px rgba(0,0,0,0.3);
         }
 
-        .overlay.visible .btn-next {
-            transform: translateY(0);
-            opacity: 1;
+        .btn-icon {
+            background: rgba(255,255,255,0.8);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+            color: var(--text-primary);
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .btn-icon:hover {
+            transform: scale(1.05);
+            background: #fff;
         }
         
+        .btn-icon svg { width: 24px; height: 24px; fill: currentColor; }
+
         /* Shake Animation */
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
@@ -499,6 +578,49 @@
             transform: translateY(0);
         }
 
+        /* Animated Hand Cursor */
+        .hand-cursor {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' style='filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));'%3E%3Cpath d='M9 2c-.55 0-1 .45-1 1v7.68l-2.48-.95c-.32-.12-.67-.03-.9.23l-.76.84 5.39 5.39c.31.31.73.49 1.17.49h6.14c.78 0 1.44-.56 1.57-1.33l.91-5.46c.03-.19.05-.38.05-.58 0-1.66-1.34-3-3-3H11V3c0-.55-.45-1-1-1z' fill='%231d1d1f'/%3E%3C/svg%3E") no-repeat center/contain;
+            pointer-events: none;
+            z-index: 100;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .hand-cursor.animating {
+            animation: handMove 2s infinite ease-in-out;
+            opacity: 1;
+        }
+
+        @keyframes handMove {
+            0% { transform: translate(30%, 150%) scale(1); }
+            20% { transform: translate(30%, 150%) scale(0.9); }
+            50% { transform: translate(150%, 50%) scale(0.9); }
+            80% { transform: translate(150%, 50%) scale(1); }
+            100% { transform: translate(30%, 150%) scale(1); }
+        }
+
+        /* Floating Feedback Text */
+        .feedback-text {
+            position: absolute;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--color-blue);
+            pointer-events: none;
+            z-index: 500;
+            animation: floatUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            text-shadow: 0 2px 10px rgba(255,255,255,0.8);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            30% { transform: translate(-50%, -100%) scale(1.2); opacity: 1; }
+            100% { transform: translate(-50%, -250%) scale(1); opacity: 0; }
+        }
+
     </style>
 </head>
 <body>
@@ -506,7 +628,14 @@
 <div class="app-container">
     <header class="header">
         <div class="logo">Kopī</div>
-        <div class="level-badge" id="level-display">Level 1</div>
+        <div class="header-controls">
+            <div class="level-badge" id="level-display">Level 1</div>
+            <button class="btn-sound" id="btn-sound" aria-label="Toggle Sound">
+                <svg viewBox="0 0 24 24">
+                    <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-4 0c-4.01.91-7 4.49-7 8.77s2.99 7.86 7 8.77v-2.06c-2.89-.86-5-3.54-5-6.71s2.11-5.85 5-6.71V3.23zM3 9v6h4l5 5V4L7 9H3z"/>
+                </svg>
+            </button>
+        </div>
     </header>
 
     <div class="game-area">
@@ -521,7 +650,12 @@
                     <div class="star">★</div><div class="star">★</div><div class="star">★</div>
                 </div>
                 <div class="level-stats" id="win-stats">Excellent Flow</div>
-                <button class="btn-next" id="btn-next">Continue</button>
+                <div class="overlay-controls">
+                    <button class="btn-icon" id="btn-replay" aria-label="Replay Level">
+                        <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+                    </button>
+                    <button class="btn-next" id="btn-next">Continue</button>
+                </div>
             </div>
         </div>
     </div>
@@ -692,9 +826,11 @@ class Game {
         this.levelDisplay = document.getElementById('level-display');
         this.overlay = document.getElementById('completion-overlay');
         this.btnNext = document.getElementById('btn-next');
+        this.btnReplay = document.getElementById('btn-replay');
         this.tutorialHint = document.getElementById('tutorial-hint');
         this.winTitle = document.getElementById('win-title');
         this.winStats = document.getElementById('win-stats');
+        this.btnSound = document.getElementById('btn-sound');
 
         // Drag State
         this.dragItem = null;
@@ -720,6 +856,11 @@ class Game {
              this.nextLevel();
         });
 
+        this.btnReplay.addEventListener('click', () => {
+             this.sound.resume();
+             this.loadLevel(this.levelIndex);
+        });
+
         this.loadLevel(this.levelIndex);
 
         // Global Pointer Events for Dragging
@@ -736,6 +877,28 @@ class Game {
         });
 
         this.resetIdleTimer();
+
+        // Sound Toggle
+        this.btnSound.addEventListener('click', () => this.toggleSound());
+        this.updateSoundIcon();
+    }
+
+    toggleSound() {
+        this.sound.enabled = !this.sound.enabled;
+        this.updateSoundIcon();
+        if (this.sound.enabled) {
+            this.sound.resume();
+            this.sound.play('pickup');
+        }
+    }
+
+    updateSoundIcon() {
+        const path = this.sound.enabled
+            ? "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"
+            : "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73 4.27 3zM12 4L9.91 6.09 12 8.18V4z";
+
+        this.btnSound.querySelector('svg').innerHTML = `<path d="${path}"/>`;
+        this.btnSound.style.opacity = this.sound.enabled ? '1' : '0.5';
     }
 
     resetIdleTimer() {
@@ -767,8 +930,14 @@ class Game {
         this.levelIndex = index;
         this.currentLevel = LEVELS[this.levelIndex % LEVELS.length];
         this.placedCount = 0;
+        this.startTime = Date.now();
 
-        this.levelDisplay.textContent = `Level ${this.levelIndex + 1} • ${this.currentLevel.title || 'Puzzle'}`;
+        // Enhanced Level Display
+        this.levelDisplay.innerHTML = `
+            <span style="opacity:0.6">${this.levelIndex + 1} / ${LEVELS.length}</span>
+            <span style="margin: 0 6px; opacity: 0.3">|</span>
+            ${this.currentLevel.title || 'Puzzle'}
+        `;
         this.overlay.classList.remove('visible');
 
         // Tutorial Logic
@@ -800,19 +969,65 @@ class Game {
         // Render Palette
         const shuffled = [...this.currentLevel.shapes].sort(() => Math.random() - 0.5);
         shuffled.forEach(shape => {
+            // Create a slot for visual structure
+            const slot = document.createElement('div');
+            slot.className = 'palette-slot';
+            this.palette.appendChild(slot);
+
             const el = document.createElement('div');
             el.className = `shape in-palette type-${shape.type} color-${shape.color}`;
             el.setAttribute('role', 'button');
             el.setAttribute('tabindex', '0');
             el.setAttribute('aria-label', `${shape.color} ${shape.type}`);
 
+            // Initial position inside slot (visually)
+            // We'll append it to palette, but we need to ensure it sits over the slot.
+            // Actually, we can append it to the palette but position it absolute relative to palette for dragging?
+            // No, the original code had them in flow.
+            // To keep "slots", we append slot, then put shape inside slot?
+            // If shape is inside slot, `position: absolute` in `.shape` might break if slot is relative.
+            // Let's modify `.shape.in-palette` to be relative or absolute.
+            // Current css: `.shape` is absolute. `.palette` is flex.
+            // If we put shape inside slot, slot is static/relative in flex. Shape is absolute.
+
+            slot.appendChild(el);
+            // Ensure shape is centered in slot
+            el.style.left = '50%';
+            el.style.top = '50%';
+            el.style.transform = 'translate(-50%, -50%)';
+            el.style.position = 'absolute';
+
             const render = document.createElement('div');
             render.className = 'shape-render';
             el.appendChild(render);
             el.dataset.shape = JSON.stringify(shape);
             el.addEventListener('pointerdown', (e) => this.onDragStart(e, el, shape));
-            this.palette.appendChild(el);
         });
+
+        // Add Tutorial Hand for Level 1
+        if (this.levelIndex === 0) {
+            this.showTutorialHand();
+        }
+    }
+
+    showTutorialHand() {
+        const hand = document.createElement('div');
+        hand.className = 'hand-cursor animating';
+
+        // Find first shape in palette to start from
+        const firstSlot = this.palette.querySelector('.palette-slot');
+        if(!firstSlot) return;
+
+        // Position roughly over the first shape
+        // We will append to palette to be safe with z-index
+        this.palette.appendChild(hand);
+
+        // Let CSS animation handle the movement illusion
+        // Or we can try to position it dynamically. CSS is safer for performance.
+        hand.style.left = '32px';
+        hand.style.top = '32px';
+
+        this.tutorialHand = hand;
     }
 
     onDragStart(e, element, data) {
@@ -845,6 +1060,11 @@ class Game {
         document.body.appendChild(this.dragGhost);
         this.dragItem.classList.add('dragging');
         this.tutorialHint.classList.remove('visible'); // Hide hint on interaction
+
+        if(this.tutorialHand) {
+            this.tutorialHand.remove();
+            this.tutorialHand = null;
+        }
 
         this.isDragging = true;
         this.dragLoop();
@@ -957,6 +1177,7 @@ class Game {
                 this.handleWin();
             } else {
                 this.sound.play('drop_success');
+                this.showFloatingFeedback(this.targetSnap.el, "Snap!");
             }
             if (navigator.vibrate) navigator.vibrate(20);
         } else {
@@ -1010,6 +1231,19 @@ class Game {
         return false;
     }
 
+    showFloatingFeedback(targetElement, text) {
+        const feedback = document.createElement('div');
+        feedback.className = 'feedback-text';
+        feedback.textContent = text;
+
+        const rect = targetElement.getBoundingClientRect();
+        feedback.style.left = (rect.left + rect.width / 2) + 'px';
+        feedback.style.top = (rect.top + rect.height / 2) + 'px';
+
+        document.body.appendChild(feedback);
+        setTimeout(() => feedback.remove(), 1000);
+    }
+
     placeShape(target) {
         // Visual fill
         const placed = document.createElement('div');
@@ -1042,8 +1276,11 @@ class Game {
         const phrases = ["Perfect", "Sublime", "Magnificent", "Beautiful", "Geometric Harmony", "Outstanding"];
         const phrase = phrases[Math.floor(Math.random() * phrases.length)];
 
+        const endTime = Date.now();
+        const duration = ((endTime - this.startTime) / 1000).toFixed(1);
+
         this.winTitle.textContent = phrase;
-        this.winStats.textContent = `Completed Level ${this.levelIndex + 1}`;
+        this.winStats.innerHTML = `Completed in <strong>${duration}s</strong>`;
 
         setTimeout(() => {
             this.sound.play('win');
