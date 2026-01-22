@@ -6,18 +6,42 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="A world-class shape matching puzzle game. Immerse yourself in a relaxing, high-fidelity experience.">
-    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness">
+    <meta name="description" content="Kopī is a world-class shape matching puzzle game designed for mindfulness. Immerse yourself in a relaxing, high-fidelity experience with glassmorphism aesthetics.">
+    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art">
+    <meta name="author" content="Kopī Interactive">
 
     <!-- Social & Open Graph -->
-    <meta property="og:title" content="Kopī - A Shape Matching Experience">
-    <meta property="og:description" content="Immerse yourself in a world of shapes and colors. A relaxing, high-fidelity puzzle game for your mind.">
+    <meta property="og:title" content="Kopī - A Mindful Shape Matching Experience">
+    <meta property="og:description" content="Find your flow. Immerse yourself in a world of shapes, colors, and satisfying physics. A relaxing, high-fidelity puzzle game for your mind.">
     <meta property="og:type" content="website">
+    <meta property="og:site_name" content="Kopī">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Kopī">
-    <meta name="twitter:description" content="A relaxing, high-fidelity puzzle game.">
+    <meta name="twitter:title" content="Kopī - Find Your Flow">
+    <meta name="twitter:description" content="A relaxing, high-fidelity puzzle game designed for mindfulness.">
 
-    <title>Kopī</title>
+    <title>Kopī | Relaxing Shape Puzzle & Mindfulness Experience</title>
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "Kopī",
+      "description": "A world-class shape matching puzzle game designed for mindfulness and relaxation.",
+      "genre": ["Puzzle", "Casual", "Mindfulness"],
+      "operatingSystem": "Web Browser",
+      "applicationCategory": "Game",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Kopī Interactive"
+      }
+    }
+    </script>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='8' y='8' width='40' height='40' rx='10' fill='%23007AFF' /%3E%3Ccircle cx='44' cy='44' r='18' fill='%23FF2D55' /%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -478,7 +502,7 @@
 
         .level-stats {
             font-size: 14px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             margin-bottom: 24px;
             font-weight: 500;
             opacity: 0;
@@ -487,7 +511,25 @@
         }
 
         .overlay.visible .level-stats {
-            opacity: 1;
+            opacity: 0.75;
+            transform: translateY(0);
+        }
+
+        .win-quote {
+            font-size: 16px;
+            font-style: italic;
+            color: var(--text-primary);
+            max-width: 80%;
+            text-align: center;
+            margin: 8px 0 24px 0;
+            line-height: 1.5;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.5s ease 0.3s;
+        }
+
+        .overlay.visible .win-quote {
+            opacity: 0.85;
             transform: translateY(0);
         }
 
@@ -630,7 +672,7 @@
         <div class="logo">Kopī</div>
         <div class="header-controls">
             <div class="level-badge" id="level-display">Level 1</div>
-            <button class="btn-sound" id="btn-sound" aria-label="Toggle Sound">
+            <button class="btn-sound" id="btn-sound" aria-label="Toggle Sound" title="Toggle Sound">
                 <svg viewBox="0 0 24 24">
                     <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-4 0c-4.01.91-7 4.49-7 8.77s2.99 7.86 7 8.77v-2.06c-2.89-.86-5-3.54-5-6.71s2.11-5.85 5-6.71V3.23zM3 9v6h4l5 5V4L7 9H3z"/>
                 </svg>
@@ -651,10 +693,10 @@
                 </div>
                 <div class="level-stats" id="win-stats">Excellent Flow</div>
                 <div class="overlay-controls">
-                    <button class="btn-icon" id="btn-replay" aria-label="Replay Level">
+                    <button class="btn-icon" id="btn-replay" aria-label="Replay Level" title="Replay Level">
                         <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
                     </button>
-                    <button class="btn-next" id="btn-next">Continue</button>
+                    <button class="btn-next" id="btn-next" title="Next Level">Continue</button>
                 </div>
             </div>
         </div>
@@ -675,6 +717,7 @@
 const LEVELS = [
     {
         title: "The Beginning",
+        subtitle: "Every journey begins with a single step.",
         shapes: [
             { id: 1, type: 'square', color: 'blue', x: 30, y: 50 },
             { id: 2, type: 'circle', color: 'pink', x: 70, y: 50 }
@@ -682,6 +725,7 @@ const LEVELS = [
     },
     {
         title: "Balance",
+        subtitle: "Find your center.",
         shapes: [
             { id: 1, type: 'triangle', color: 'green', x: 50, y: 30, rotation: 0 },
             { id: 2, type: 'square', color: 'yellow', x: 30, y: 70 },
@@ -690,6 +734,7 @@ const LEVELS = [
     },
     {
         title: "Reflection",
+        subtitle: "Look within.",
         shapes: [
             { id: 1, type: 'square', color: 'pink', x: 25, y: 25 },
             { id: 2, type: 'square', color: 'pink', x: 75, y: 75 },
@@ -699,6 +744,7 @@ const LEVELS = [
     },
     {
         title: "Ascension",
+        subtitle: "Rise above.",
         shapes: [
             { id: 1, type: 'triangle', color: 'yellow', x: 50, y: 20, rotation: 0 },
             { id: 2, type: 'triangle', color: 'blue', x: 50, y: 50, rotation: 180 },
@@ -707,6 +753,7 @@ const LEVELS = [
     },
     {
         title: "Chaos",
+        subtitle: "Order from disorder.",
         shapes: [
             { id: 1, type: 'circle', color: 'blue', x: 20, y: 20 },
             { id: 2, type: 'circle', color: 'yellow', x: 80, y: 80 },
@@ -717,6 +764,7 @@ const LEVELS = [
     },
     {
         title: "Alignment",
+        subtitle: "Everything in its place.",
         shapes: [
             { id: 1, type: 'square', color: 'yellow', x: 20, y: 50 },
             { id: 2, type: 'triangle', color: 'pink', x: 40, y: 50, rotation: 90 },
@@ -726,6 +774,7 @@ const LEVELS = [
     },
     {
         title: "Zenith",
+        subtitle: "Reach for the peak.",
         shapes: [
             { id: 1, type: 'triangle', color: 'green', x: 50, y: 25, rotation: 0 },
             { id: 2, type: 'triangle', color: 'green', x: 30, y: 60, rotation: -45 },
@@ -735,6 +784,7 @@ const LEVELS = [
     },
     {
         title: "Harmony",
+        subtitle: "Perfect resonance.",
         shapes: [
             { id: 1, type: 'square', color: 'blue', x: 35, y: 35 },
             { id: 2, type: 'square', color: 'pink', x: 65, y: 65 },
@@ -742,7 +792,63 @@ const LEVELS = [
             { id: 4, type: 'circle', color: 'green', x: 35, y: 65 },
             { id: 5, type: 'triangle', color: 'blue', x: 50, y: 50, rotation: 180 }
         ]
+    },
+    {
+        title: "Complexity",
+        subtitle: "Embrace the challenge.",
+        shapes: [
+            { id: 1, type: 'square', color: 'yellow', x: 25, y: 25 },
+            { id: 2, type: 'square', color: 'blue', x: 75, y: 75 },
+            { id: 3, type: 'triangle', color: 'pink', x: 75, y: 25, rotation: -90 },
+            { id: 4, type: 'triangle', color: 'green', x: 25, y: 75, rotation: 90 },
+            { id: 5, type: 'circle', color: 'blue', x: 50, y: 50 }
+        ]
+    },
+    {
+        title: "Rhythm",
+        subtitle: "Feel the flow.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'pink', x: 20, y: 50 },
+            { id: 2, type: 'circle', color: 'pink', x: 40, y: 50 },
+            { id: 3, type: 'circle', color: 'pink', x: 60, y: 50 },
+            { id: 4, type: 'circle', color: 'pink', x: 80, y: 50 },
+            { id: 5, type: 'triangle', color: 'yellow', x: 50, y: 20, rotation: 180 },
+            { id: 6, type: 'triangle', color: 'yellow', x: 50, y: 80, rotation: 0 }
+        ]
+    },
+    {
+        title: "Symmetry",
+        subtitle: "Reflect on beauty.",
+        shapes: [
+            { id: 1, type: 'square', color: 'blue', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'green', x: 30, y: 30 },
+            { id: 3, type: 'circle', color: 'green', x: 70, y: 70 },
+            { id: 4, type: 'triangle', color: 'yellow', x: 70, y: 30, rotation: 45 },
+            { id: 5, type: 'triangle', color: 'yellow', x: 30, y: 70, rotation: -135 }
+        ]
+    },
+    {
+        title: "Transcendence",
+        subtitle: "Beyond the form.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'pink', x: 50, y: 20 },
+            { id: 2, type: 'square', color: 'blue', x: 80, y: 50 },
+            { id: 3, type: 'triangle', color: 'green', x: 50, y: 80, rotation: 0 },
+            { id: 4, type: 'circle', color: 'yellow', x: 20, y: 50 },
+            { id: 5, type: 'square', color: 'pink', x: 50, y: 50 }
+        ]
     }
+];
+
+const QUOTES = [
+    "Breathing in, I calm body and mind. Breathing out, I smile.",
+    "The present moment is filled with joy and happiness.",
+    "Feelings come and go like clouds in a windy sky. Conscious breathing is my anchor.",
+    "Peace comes from within. Do not seek it without.",
+    "Quiet the mind, and the soul will speak.",
+    "Simplicity is the ultimate sophistication.",
+    "Nature does not hurry, yet everything is accomplished.",
+    "The best way to capture moments is to pay attention."
 ];
 
 class SoundEngine {
@@ -817,6 +923,7 @@ class Game {
         this.levelIndex = 0;
         this.currentLevel = null;
         this.placedCount = 0;
+        this.mistakes = 0;
 
         this.sound = new SoundEngine();
 
@@ -930,6 +1037,7 @@ class Game {
         this.levelIndex = index;
         this.currentLevel = LEVELS[this.levelIndex % LEVELS.length];
         this.placedCount = 0;
+        this.mistakes = 0;
         this.startTime = Date.now();
 
         // Enhanced Level Display
@@ -940,11 +1048,19 @@ class Game {
         `;
         this.overlay.classList.remove('visible');
 
-        // Tutorial Logic
+        // Tutorial / Subtitle Logic
+        this.tutorialHint.classList.remove('visible');
+
         if (this.levelIndex === 0) {
+            this.tutorialHint.textContent = "Drag shapes to match";
             this.tutorialHint.classList.add('visible');
-        } else {
-            this.tutorialHint.classList.remove('visible');
+        } else if (this.currentLevel.subtitle) {
+            // Show subtitle briefly
+            this.tutorialHint.textContent = this.currentLevel.subtitle;
+            this.tutorialHint.classList.add('visible');
+            setTimeout(() => {
+                if(this.placedCount === 0) this.tutorialHint.classList.remove('visible');
+            }, 4000);
         }
 
         this.canvas.innerHTML = '';
@@ -1181,6 +1297,7 @@ class Game {
             }
             if (navigator.vibrate) navigator.vibrate(20);
         } else {
+            this.mistakes++;
             this.dragItem.classList.remove('dragging');
             this.sound.play('drop_fail');
 
@@ -1272,15 +1389,36 @@ class Game {
     }
 
     handleWin() {
-        // Random praise
-        const phrases = ["Perfect", "Sublime", "Magnificent", "Beautiful", "Geometric Harmony", "Outstanding"];
-        const phrase = phrases[Math.floor(Math.random() * phrases.length)];
-
         const endTime = Date.now();
         const duration = ((endTime - this.startTime) / 1000).toFixed(1);
+        const accuracy = Math.max(0, 100 - (this.mistakes * 15));
+
+        // Dynamic praise based on performance
+        let phrase = "Beautiful";
+        if (accuracy === 100 && duration < 10) phrase = "Perfect Flow";
+        else if (accuracy === 100) phrase = "Sublime Focus";
+        else if (accuracy >= 80) phrase = "Geometric Harmony";
+        else phrase = "Mindful Progress";
 
         this.winTitle.textContent = phrase;
-        this.winStats.innerHTML = `Completed in <strong>${duration}s</strong>`;
+
+        // Quote Logic
+        const quote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
+        let quoteEl = document.getElementById('win-quote');
+        if (!quoteEl) {
+            quoteEl = document.createElement('p');
+            quoteEl.id = 'win-quote';
+            quoteEl.className = 'win-quote';
+            this.winStats.parentNode.insertBefore(quoteEl, this.winStats);
+        }
+        quoteEl.textContent = `"${quote}"`;
+
+        this.winStats.innerHTML = `
+            <div style="display: flex; gap: 20px; justify-content: center; align-items: center;">
+                <span title="Time taken">⏱ ${duration}s</span>
+                <span title="Precision" style="opacity: ${accuracy === 100 ? 1 : 0.7}">🎯 ${accuracy}%</span>
+            </div>
+        `;
 
         setTimeout(() => {
             this.sound.play('win');
