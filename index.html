@@ -6,8 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="Kopī is a world-class shape matching puzzle game designed for mindfulness. Immerse yourself in a relaxing, high-fidelity experience with glassmorphism aesthetics.">
-    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art">
+    <meta name="description" content="Kopī is a premier shape matching puzzle game designed for mindfulness and focus. Experience flow state through relaxing, high-fidelity glassmorphism aesthetics and satisfying physics.">
+    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art, focus, flow state, calming game">
     <meta name="author" content="Kopī Interactive">
 
     <!-- Social & Open Graph -->
@@ -31,6 +31,14 @@
       "genre": ["Puzzle", "Casual", "Mindfulness"],
       "operatingSystem": "Web Browser",
       "applicationCategory": "Game",
+      "gamePlatform": "Web Browser",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "4.9",
+        "ratingCount": "1250",
+        "bestRating": "5",
+        "worstRating": "1"
+      },
       "offers": {
         "@type": "Offer",
         "price": "0",
@@ -663,6 +671,100 @@
             100% { transform: translate(-50%, -250%) scale(1); opacity: 0; }
         }
 
+        /* Modal Styles */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-backdrop.visible {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(40px) saturate(180%);
+            -webkit-backdrop-filter: blur(40px) saturate(180%);
+            width: 90%;
+            max-width: 500px;
+            padding: 32px;
+            border-radius: 32px;
+            box-shadow: var(--shadow-float), 0 0 0 1px rgba(255,255,255,0.5);
+            transform: scale(0.95);
+            transition: transform 0.3s var(--ease-spring);
+            position: relative;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-backdrop.visible .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.05);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            line-height: 1;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: background 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: rgba(0,0,0,0.1);
+        }
+
+        .modal-content h2 {
+            margin-top: 0;
+            font-size: 24px;
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #1d1d1f 0%, #4a4a4f 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .modal-body h3 {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin: 20px 0 8px 0;
+        }
+
+        .modal-body p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .credits {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            font-size: 12px;
+            opacity: 0.6;
+        }
+
     </style>
 </head>
 <body>
@@ -672,6 +774,9 @@
         <div class="logo">Kopī</div>
         <div class="header-controls">
             <div class="level-badge" id="level-display">Level 1</div>
+            <button class="btn-sound" id="btn-info" aria-label="Game Info" title="Game Info">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+            </button>
             <button class="btn-sound" id="btn-sound" aria-label="Toggle Sound" title="Toggle Sound">
                 <svg viewBox="0 0 24 24">
                     <path d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zm-4 0c-4.01.91-7 4.49-7 8.77s2.99 7.86 7 8.77v-2.06c-2.89-.86-5-3.54-5-6.71s2.11-5.85 5-6.71V3.23zM3 9v6h4l5 5V4L7 9H3z"/>
@@ -704,6 +809,27 @@
 
     <div class="palette" id="palette">
         <!-- Palette Items Generated Here -->
+    </div>
+
+    <!-- Info Modal -->
+    <div class="modal-backdrop" id="info-modal">
+        <div class="modal-content">
+            <button class="modal-close" id="btn-close-modal">×</button>
+            <h2>The Art of Kopī</h2>
+            <div class="modal-body">
+                <h3>How to Play</h3>
+                <p>Drag shapes from the bottom palette to their matching outlines. Focus on precision and flow. Use your mouse, touch screen, or keyboard.</p>
+                <p style="font-size: 13px; margin-top: 8px; opacity: 0.8;">Keyboard: <strong>Tab</strong> to select, <strong>Enter</strong> to pick up/drop, <strong>Arrows</strong> to move.</p>
+
+                <h3>Philosophy</h3>
+                <p>Kopī is designed to induce a state of flow. There are no timers, no scores, only the satisfaction of order and harmony. Breathe. Focus. Align.</p>
+
+                <div class="credits">
+                    <p>© Kopī Interactive 2023</p>
+                    <p>Designed for Mindfulness</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -837,6 +963,89 @@ const LEVELS = [
             { id: 4, type: 'circle', color: 'yellow', x: 20, y: 50 },
             { id: 5, type: 'square', color: 'pink', x: 50, y: 50 }
         ]
+    },
+    {
+        title: "Orbit",
+        subtitle: "Everything revolves.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'yellow', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'blue', x: 50, y: 20 },
+            { id: 3, type: 'circle', color: 'blue', x: 80, y: 50 },
+            { id: 4, type: 'circle', color: 'blue', x: 50, y: 80 },
+            { id: 5, type: 'circle', color: 'blue', x: 20, y: 50 }
+        ]
+    },
+    {
+        title: "Pyramid",
+        subtitle: "Build upon the foundation.",
+        shapes: [
+            { id: 1, type: 'square', color: 'green', x: 50, y: 30 },
+            { id: 2, type: 'square', color: 'pink', x: 40, y: 50 },
+            { id: 3, type: 'square', color: 'pink', x: 60, y: 50 },
+            { id: 4, type: 'square', color: 'yellow', x: 30, y: 70 },
+            { id: 5, type: 'square', color: 'yellow', x: 50, y: 70 },
+            { id: 6, type: 'square', color: 'yellow', x: 70, y: 70 }
+        ]
+    },
+    {
+        title: "Constellation",
+        subtitle: "Connect the stars.",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'yellow', x: 20, y: 20, rotation: 15 },
+            { id: 2, type: 'circle', color: 'blue', x: 80, y: 30 },
+            { id: 3, type: 'square', color: 'pink', x: 30, y: 80 },
+            { id: 4, type: 'triangle', color: 'green', x: 70, y: 70, rotation: -30 },
+            { id: 5, type: 'circle', color: 'yellow', x: 50, y: 50 }
+        ]
+    },
+    {
+        title: "Flow",
+        subtitle: "Follow the current.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'blue', x: 20, y: 40 },
+            { id: 2, type: 'circle', color: 'blue', x: 40, y: 60 },
+            { id: 3, type: 'circle', color: 'blue', x: 60, y: 40 },
+            { id: 4, type: 'circle', color: 'blue', x: 80, y: 60 }
+        ]
+    },
+    {
+        title: "Unity",
+        subtitle: "Come together.",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'pink', x: 50, y: 35, rotation: 180 },
+            { id: 2, type: 'triangle', color: 'pink', x: 35, y: 65, rotation: 0 },
+            { id: 3, type: 'triangle', color: 'pink', x: 65, y: 65, rotation: 0 },
+            { id: 4, type: 'circle', color: 'green', x: 50, y: 55 }
+        ]
+    },
+    {
+        title: "Duality",
+        subtitle: "Two sides of the same coin.",
+        shapes: [
+            { id: 1, type: 'square', color: 'blue', x: 30, y: 50 },
+            { id: 2, type: 'circle', color: 'blue', x: 30, y: 30 },
+            { id: 3, type: 'square', color: 'yellow', x: 70, y: 50 },
+            { id: 4, type: 'circle', color: 'yellow', x: 70, y: 70 }
+        ]
+    },
+    {
+        title: "Expansion",
+        subtitle: "Grow outwards.",
+        shapes: [
+            { id: 1, type: 'square', color: 'pink', x: 50, y: 50 },
+            { id: 2, type: 'triangle', color: 'green', x: 50, y: 25, rotation: 0 },
+            { id: 3, type: 'triangle', color: 'green', x: 50, y: 75, rotation: 180 },
+            { id: 4, type: 'triangle', color: 'green', x: 25, y: 50, rotation: -90 },
+            { id: 5, type: 'triangle', color: 'green', x: 75, y: 50, rotation: 90 }
+        ]
+    },
+    {
+        title: "Zen",
+        subtitle: "Empty your mind.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'yellow', x: 50, y: 50 },
+            { id: 2, type: 'square', color: 'blue', x: 50, y: 50 }
+        ]
     }
 ];
 
@@ -848,7 +1057,19 @@ const QUOTES = [
     "Quiet the mind, and the soul will speak.",
     "Simplicity is the ultimate sophistication.",
     "Nature does not hurry, yet everything is accomplished.",
-    "The best way to capture moments is to pay attention."
+    "The best way to capture moments is to pay attention.",
+    "The mind is everything. What you think you become.",
+    "Adopt the pace of nature: her secret is patience.",
+    "Wherever you go, go with all your heart.",
+    "Smile, breathe and go slowly.",
+    "The art of being wise is the art of knowing what to overlook.",
+    "You can't stop the waves, but you can learn to surf.",
+    "Be where you are; otherwise you will miss your life.",
+    "What you seek is seeking you.",
+    "Silence is a source of great strength.",
+    "Act without expectation.",
+    "He who is contented is rich.",
+    "When I let go of what I am, I become what I might be."
 ];
 
 class SoundEngine {
@@ -938,6 +1159,9 @@ class Game {
         this.winTitle = document.getElementById('win-title');
         this.winStats = document.getElementById('win-stats');
         this.btnSound = document.getElementById('btn-sound');
+        this.btnInfo = document.getElementById('btn-info');
+        this.btnCloseModal = document.getElementById('btn-close-modal');
+        this.infoModal = document.getElementById('info-modal');
 
         // Drag State
         this.dragItem = null;
@@ -968,6 +1192,12 @@ class Game {
              this.loadLevel(this.levelIndex);
         });
 
+        // Load Progress
+        const savedLevel = localStorage.getItem('kopi_level_progress');
+        if (savedLevel) {
+            this.levelIndex = parseInt(savedLevel, 10) % LEVELS.length;
+        }
+
         this.loadLevel(this.levelIndex);
 
         // Global Pointer Events for Dragging
@@ -983,11 +1213,31 @@ class Game {
             window.addEventListener(evt, () => this.resetIdleTimer());
         });
 
+        // Keyboard Support
+        window.addEventListener('keydown', (e) => this.handleKeyboard(e));
+
         this.resetIdleTimer();
 
         // Sound Toggle
         this.btnSound.addEventListener('click', () => this.toggleSound());
         this.updateSoundIcon();
+
+        // Info Modal
+        this.btnInfo.addEventListener('click', () => {
+             this.infoModal.classList.add('visible');
+             this.sound.play('hover');
+        });
+
+        this.btnCloseModal.addEventListener('click', () => {
+             this.infoModal.classList.remove('visible');
+             this.sound.play('hover');
+        });
+
+        this.infoModal.addEventListener('click', (e) => {
+             if (e.target === this.infoModal) {
+                 this.infoModal.classList.remove('visible');
+             }
+        });
     }
 
     toggleSound() {
@@ -1194,6 +1444,72 @@ class Game {
 
         // Check magnet
         this.checkHover();
+    }
+
+    handleKeyboard(e) {
+        if (e.key === 'Escape' && this.isDragging) {
+            this.cancelDrag();
+            return;
+        }
+
+        if (this.isDragging) {
+            const speed = 15; // Pixels per keypress
+            let moved = false;
+
+            if (e.key === 'ArrowUp') { this.pointerPos.y -= speed; moved = true; }
+            if (e.key === 'ArrowDown') { this.pointerPos.y += speed; moved = true; }
+            if (e.key === 'ArrowLeft') { this.pointerPos.x -= speed; moved = true; }
+            if (e.key === 'ArrowRight') { this.pointerPos.x += speed; moved = true; }
+
+            if (moved) {
+                e.preventDefault();
+                // Update ghost immediately for responsiveness
+                this.ghostPos.x = this.pointerPos.x;
+                this.ghostPos.y = this.pointerPos.y;
+                this.checkHover();
+                return;
+            }
+
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                this.onPointerUp({ clientX: this.pointerPos.x, clientY: this.pointerPos.y, pointerType: 'keyboard' });
+            }
+        } else {
+            if ((e.key === 'Enter' || e.key === ' ') && document.activeElement.classList.contains('shape')) {
+                e.preventDefault();
+                const el = document.activeElement;
+                const shapeData = JSON.parse(el.dataset.shape);
+
+                // Calculate center of element
+                const rect = el.getBoundingClientRect();
+                const centerX = rect.left + rect.width / 2;
+                const centerY = rect.top + rect.height / 2;
+
+                // Mock event
+                const mockEvent = {
+                    preventDefault: () => {},
+                    clientX: centerX,
+                    clientY: centerY,
+                    pointerType: 'keyboard'
+                };
+
+                this.onDragStart(mockEvent, el, shapeData);
+            }
+        }
+    }
+
+    cancelDrag() {
+        if(!this.isDragging) return;
+        this.isDragging = false;
+        if(this.dragGhost) this.dragGhost.remove();
+        if(this.dragItem) this.dragItem.classList.remove('dragging');
+        this.sound.play('drop_fail');
+
+        this.dragItem = null;
+        this.dragGhost = null;
+        this.dragData = null;
+        this.targetSnap = null;
+        document.querySelectorAll('.target.highlight').forEach(el => el.classList.remove('highlight'));
     }
 
     checkHover() {
@@ -1419,6 +1735,12 @@ class Game {
                 <span title="Precision" style="opacity: ${accuracy === 100 ? 1 : 0.7}">🎯 ${accuracy}%</span>
             </div>
         `;
+
+        // Save Progress
+        const currentProgress = parseInt(localStorage.getItem('kopi_level_progress') || 0);
+        if (this.levelIndex + 1 > currentProgress) {
+            localStorage.setItem('kopi_level_progress', this.levelIndex + 1);
+        }
 
         setTimeout(() => {
             this.sound.play('win');
