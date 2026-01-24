@@ -6,20 +6,20 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="Kopī is a premier shape matching puzzle game designed for mindfulness and focus. Experience flow state through relaxing, high-fidelity glassmorphism aesthetics and satisfying physics.">
-    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art, focus, flow state, calming game">
+    <meta name="description" content="Kopī is a premier shape matching puzzle game designed for mindfulness and focus. Experience flow state with new vibrant themes, complex geometries, and satisfying physics.">
+    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art, focus, flow state, calming game, hexagon puzzle, logic game, geometric puzzle">
     <meta name="author" content="Kopī Interactive">
 
     <!-- Social & Open Graph -->
-    <meta property="og:title" content="Kopī - A Mindful Shape Matching Experience">
-    <meta property="og:description" content="Find your flow. Immerse yourself in a world of shapes, colors, and satisfying physics. A relaxing, high-fidelity puzzle game for your mind.">
+    <meta property="og:title" content="Kopī | Mindful Shape Matching & Puzzle Flow">
+    <meta property="og:description" content="Find your flow. Immerse yourself in a world of new shapes, vibrant colors, and satisfying physics. A relaxing, high-fidelity puzzle game for your mind.">
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Kopī">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Kopī - Find Your Flow">
-    <meta name="twitter:description" content="A relaxing, high-fidelity puzzle game designed for mindfulness.">
+    <meta name="twitter:title" content="Kopī | Mindful Shape Matching & Puzzle Flow">
+    <meta name="twitter:description" content="A relaxing, high-fidelity puzzle game designed for mindfulness and flow.">
 
-    <title>Kopī | Relaxing Shape Puzzle & Mindfulness Experience</title>
+    <title>Kopī | Mindful Shape Matching & Puzzle Flow</title>
 
     <!-- Structured Data -->
     <script type="application/ld+json">
@@ -368,7 +368,6 @@
             clip-path: polygon(50% 10%, 10% 85%, 90% 85%);
             border-radius: 0;
             box-shadow: none;
-            background-color: transparent !important; /* Fix for bg bleed */
             /* Use filter for drop shadow on clipped shapes */
             filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
         }
@@ -377,11 +376,53 @@
             background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
         }
 
+        .type-diamond .shape-render {
+            clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%);
+            border-radius: 0;
+            box-shadow: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+        .type-diamond .shape-render::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
+        }
+
+        .type-pentagon .shape-render {
+            clip-path: polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%);
+            border-radius: 0;
+            box-shadow: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+        .type-pentagon .shape-render::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
+        }
+
+        .type-hexagon .shape-render {
+            clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+            border-radius: 0;
+            box-shadow: none;
+            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.15));
+        }
+        .type-hexagon .shape-render::after {
+            background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 60%);
+        }
+
+        /* Visibility for targets of clipped shapes (since border/inset-shadow are clipped) */
+        .target.type-triangle .shape-render,
+        .target.type-diamond .shape-render,
+        .target.type-pentagon .shape-render,
+        .target.type-hexagon .shape-render {
+            background: rgba(0,0,0,0.15);
+            border: none;
+        }
+
         /* Colors with slight gradient for depth */
         .color-blue .shape-render { background: linear-gradient(145deg, #2b95ff, #0066d6); }
         .color-pink .shape-render { background: linear-gradient(145deg, #ff5274, #e01640); }
         .color-green .shape-render { background: linear-gradient(145deg, #5ddb7d, #24b348); }
         .color-yellow .shape-render { background: linear-gradient(145deg, #ffd633, #eebb00); }
+        .color-purple .shape-render { background: linear-gradient(145deg, #AF52DE, #5E5CE6); }
+        .color-orange .shape-render { background: linear-gradient(145deg, #FF9500, #FF3B30); }
+        .color-cyan .shape-render { background: linear-gradient(145deg, #5AC8FA, #007AFF); }
 
         /* Targets */
         .target {
@@ -818,11 +859,23 @@
             <h2>The Art of Kopī</h2>
             <div class="modal-body">
                 <h3>How to Play</h3>
-                <p>Drag shapes from the bottom palette to their matching outlines. Focus on precision and flow. Use your mouse, touch screen, or keyboard.</p>
-                <p style="font-size: 13px; margin-top: 8px; opacity: 0.8;">Keyboard: <strong>Tab</strong> to select, <strong>Enter</strong> to pick up/drop, <strong>Arrows</strong> to move.</p>
+                <p>Drag shapes from the bottom palette to their matching outlines. Feel the <strong>precision snapping</strong> guide your hand. Focus on flow.</p>
+                <p style="font-size: 13px; margin-top: 8px; opacity: 0.8;">
+                    <strong>Controls:</strong> Mouse, Touch, or Keyboard.<br>
+                    <strong>Keyboard:</strong> Tab to select, Enter/Space to grab & drop, Arrows to move. Escape to cancel.
+                </p>
 
                 <h3>Philosophy</h3>
                 <p>Kopī is designed to induce a state of flow. There are no timers, no scores, only the satisfaction of order and harmony. Breathe. Focus. Align.</p>
+                <p style="margin-top: 12px;">Listen to the silence. The procedural audio engine generates unique, harmonic tones for every interaction, creating a personal soundscape for your journey.</p>
+
+                <h3>Features</h3>
+                <ul style="padding-left: 20px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
+                    <li>Procedural Audio Synthesis</li>
+                    <li>Touch-Optimized Physics</li>
+                    <li>P3 Wide Color Gamut Support</li>
+                    <li>Pure Focus (No Ads, No Tracking)</li>
+                </ul>
 
                 <div class="credits">
                     <p>© Kopī Interactive 2023</p>
@@ -1046,6 +1099,107 @@ const LEVELS = [
             { id: 1, type: 'circle', color: 'yellow', x: 50, y: 50 },
             { id: 2, type: 'square', color: 'blue', x: 50, y: 50 }
         ]
+    },
+    {
+        title: "Crystal",
+        subtitle: "Clarity of vision.",
+        shapes: [
+            { id: 1, type: 'diamond', color: 'cyan', x: 50, y: 50 },
+            { id: 2, type: 'diamond', color: 'purple', x: 50, y: 20 },
+            { id: 3, type: 'diamond', color: 'purple', x: 50, y: 80 }
+        ]
+    },
+    {
+        title: "Prism",
+        subtitle: "Refract the light.",
+        shapes: [
+            { id: 1, type: 'pentagon', color: 'orange', x: 30, y: 50 },
+            { id: 2, type: 'pentagon', color: 'cyan', x: 70, y: 50 },
+            { id: 3, type: 'triangle', color: 'purple', x: 50, y: 20, rotation: 180 }
+        ]
+    },
+    {
+        title: "Hive",
+        subtitle: "Collective wisdom.",
+        shapes: [
+            { id: 1, type: 'hexagon', color: 'yellow', x: 50, y: 50 },
+            { id: 2, type: 'hexagon', color: 'orange', x: 25, y: 35 },
+            { id: 3, type: 'hexagon', color: 'orange', x: 75, y: 35 },
+            { id: 4, type: 'hexagon', color: 'orange', x: 25, y: 65 },
+            { id: 5, type: 'hexagon', color: 'orange', x: 75, y: 65 }
+        ]
+    },
+    {
+        title: "Mosaic",
+        subtitle: "Pieces make the whole.",
+        shapes: [
+            { id: 1, type: 'diamond', color: 'purple', x: 50, y: 50 },
+            { id: 2, type: 'triangle', color: 'cyan', x: 30, y: 30, rotation: 45 },
+            { id: 3, type: 'triangle', color: 'cyan', x: 70, y: 70, rotation: 225 },
+            { id: 4, type: 'square', color: 'pink', x: 70, y: 30 },
+            { id: 5, type: 'square', color: 'pink', x: 30, y: 70 }
+        ]
+    },
+    {
+        title: "Nebula",
+        subtitle: "Birth of stars.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'purple', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'cyan', x: 20, y: 20 },
+            { id: 3, type: 'circle', color: 'cyan', x: 80, y: 80 },
+            { id: 4, type: 'diamond', color: 'orange', x: 80, y: 20 },
+            { id: 5, type: 'diamond', color: 'orange', x: 20, y: 80 }
+        ]
+    },
+    {
+        title: "Fortress",
+        subtitle: "Strong foundations.",
+        shapes: [
+            { id: 1, type: 'pentagon', color: 'blue', x: 50, y: 30 },
+            { id: 2, type: 'square', color: 'green', x: 35, y: 60 },
+            { id: 3, type: 'square', color: 'green', x: 65, y: 60 },
+            { id: 4, type: 'square', color: 'green', x: 50, y: 80 }
+        ]
+    },
+    {
+        title: "Gemini",
+        subtitle: "Reflected glory.",
+        shapes: [
+            { id: 1, type: 'hexagon', color: 'purple', x: 30, y: 50 },
+            { id: 2, type: 'hexagon', color: 'cyan', x: 70, y: 50 },
+            { id: 3, type: 'diamond', color: 'orange', x: 50, y: 30 },
+            { id: 4, type: 'diamond', color: 'orange', x: 50, y: 70 }
+        ]
+    },
+    {
+        title: "Summit",
+        subtitle: "The view from above.",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'cyan', x: 50, y: 20 },
+            { id: 2, type: 'pentagon', color: 'purple', x: 50, y: 50 },
+            { id: 3, type: 'square', color: 'blue', x: 30, y: 80 },
+            { id: 4, type: 'square', color: 'blue', x: 70, y: 80 }
+        ]
+    },
+    {
+        title: "Spectrum",
+        subtitle: "All colors as one.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'pink', x: 20, y: 50 },
+            { id: 2, type: 'square', color: 'orange', x: 40, y: 50 },
+            { id: 3, type: 'pentagon', color: 'yellow', x: 60, y: 50 },
+            { id: 4, type: 'hexagon', color: 'green', x: 80, y: 50 },
+            { id: 5, type: 'diamond', color: 'cyan', x: 50, y: 20 }
+        ]
+    },
+    {
+        title: "Eternity",
+        subtitle: "The cycle continues.",
+        shapes: [
+            { id: 1, type: 'hexagon', color: 'purple', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'cyan', x: 50, y: 50 },
+            { id: 3, type: 'diamond', color: 'orange', x: 50, y: 50 }
+        ]
     }
 ];
 
@@ -1069,7 +1223,22 @@ const QUOTES = [
     "Silence is a source of great strength.",
     "Act without expectation.",
     "He who is contented is rich.",
-    "When I let go of what I am, I become what I might be."
+    "When I let go of what I am, I become what I might be.",
+    "Realize deeply that the present moment is all you have.",
+    "To the mind that is still, the whole universe surrenders.",
+    "Silence is the sleep that nourishes wisdom.",
+    "Empty your cup so that it may be filled.",
+    "When you realize nothing is lacking, the whole world belongs to you.",
+    "Water does not resist. Water flows.",
+    "Stillness is the language of God, everything else is poor translation.",
+    "The way is not in the sky. The way is in the heart.",
+    "Do not dwell in the past, do not dream of the future, concentrate the mind on the present moment.",
+    "In the midst of movement and chaos, keep stillness inside of you.",
+    "Muddy water is best cleared by leaving it alone.",
+    "One moment of patience may ward off great disaster.",
+    "Purity and impurity depend on oneself; no one can purify another.",
+    "Flow with whatever may happen, and let your mind be free.",
+    "Life is a series of natural and spontaneous changes."
 ];
 
 class SoundEngine {
@@ -1711,8 +1880,10 @@ class Game {
 
         // Dynamic praise based on performance
         let phrase = "Beautiful";
-        if (accuracy === 100 && duration < 10) phrase = "Perfect Flow";
+        if (accuracy === 100 && duration < 8) phrase = "Transcendent";
+        else if (accuracy === 100 && duration < 12) phrase = "Perfect Flow";
         else if (accuracy === 100) phrase = "Sublime Focus";
+        else if (accuracy >= 90) phrase = "Ethereal";
         else if (accuracy >= 80) phrase = "Geometric Harmony";
         else phrase = "Mindful Progress";
 
