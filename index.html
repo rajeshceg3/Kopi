@@ -6,8 +6,8 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#f5f5f7">
-    <meta name="description" content="Kopī is a premier shape matching puzzle game designed for mindfulness and focus. Experience flow state with new vibrant themes, complex geometries, and satisfying physics.">
-    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art, focus, flow state, calming game, hexagon puzzle, logic game, geometric puzzle">
+    <meta name="description" content="Kopī is a premier shape matching puzzle game designed for mindfulness and focus. Experience flow state with 35+ levels, complex geometries, and satisfying physics.">
+    <meta name="keywords" content="puzzle, shape matching, game, relaxing, brain training, glassmorphism, web game, mindfulness, meditation, zen, stress relief, interactive art, focus, flow state, calming game, hexagon puzzle, logic game, geometric puzzle, flow science, cognitive health">
     <meta name="author" content="Kopī Interactive">
 
     <!-- Social & Open Graph -->
@@ -870,16 +870,19 @@
             <button class="modal-close" id="btn-close-modal">×</button>
             <h2>The Art of Kopī</h2>
             <div class="modal-body">
+                <h3>The Philosophy of Flow</h3>
+                <p>Kopī is more than a puzzle; it is a digital sanctuary. In an era of infinite scroll and constant noise, we offer a finite, quiet space. Here, the only objective is alignment. The only reward is harmony.</p>
+                <p style="margin-top: 12px;">By focusing on the simple, tactile act of matching shapes, you invite the mind to settle. There are no timers to race, no scores to chase. Just you, the shapes, and the satisfaction of order.</p>
+
+                <h3>The Science</h3>
+                <p>This game is designed to induce <strong>Flow State</strong>—a psychological zone of immersed focus. Engaging in clear tasks with immediate feedback lowers cortisol levels and promotes alpha brain wave activity, associated with deep relaxation and alert calm.</p>
+
                 <h3>How to Play</h3>
-                <p>Drag shapes from the bottom palette to their matching outlines. Feel the <strong>precision snapping</strong> guide your hand. Focus on flow.</p>
+                <p>Drag shapes from the bottom palette to their matching outlines. Feel the <strong>magnetic snap</strong> guide your hand. Listen to the harmonic cues.</p>
                 <p style="font-size: 13px; margin-top: 8px; opacity: 0.8;">
                     <strong>Controls:</strong> Mouse, Touch, or Keyboard.<br>
                     <strong>Keyboard:</strong> Tab to select, Enter/Space to grab & drop, Arrows to move. Escape to cancel.
                 </p>
-
-                <h3>Philosophy</h3>
-                <p>Kopī is designed to induce a state of flow. There are no timers, no scores, only the satisfaction of order and harmony. Breathe. Focus. Align.</p>
-                <p style="margin-top: 12px;">Listen to the silence. The procedural audio engine generates unique, harmonic tones for every interaction, creating a personal soundscape for your journey.</p>
 
                 <h3>Features</h3>
                 <ul style="padding-left: 20px; font-size: 14px; color: var(--text-secondary); line-height: 1.6;">
@@ -1212,6 +1215,114 @@ const LEVELS = [
             { id: 2, type: 'circle', color: 'cyan', x: 50, y: 50 },
             { id: 3, type: 'diamond', color: 'orange', x: 50, y: 50 }
         ]
+    },
+    {
+        title: "Echo",
+        subtitle: "Voices returning.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'blue', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'blue', x: 20, y: 20 },
+            { id: 3, type: 'circle', color: 'blue', x: 80, y: 80 },
+            { id: 4, type: 'circle', color: 'blue', x: 20, y: 80 },
+            { id: 5, type: 'circle', color: 'blue', x: 80, y: 20 }
+        ]
+    },
+    {
+        title: "Structure",
+        subtitle: "Built to last.",
+        shapes: [
+            { id: 1, type: 'square', color: 'green', x: 50, y: 50 },
+            { id: 2, type: 'square', color: 'green', x: 30, y: 30 },
+            { id: 3, type: 'square', color: 'green', x: 70, y: 70 },
+            { id: 4, type: 'square', color: 'green', x: 30, y: 70 },
+            { id: 5, type: 'square', color: 'green', x: 70, y: 30 }
+        ]
+    },
+    {
+        title: "Ascent",
+        subtitle: "Climbing higher.",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'pink', x: 50, y: 20, rotation: 0 },
+            { id: 2, type: 'triangle', color: 'pink', x: 40, y: 40, rotation: 0 },
+            { id: 3, type: 'triangle', color: 'pink', x: 60, y: 40, rotation: 0 },
+            { id: 4, type: 'triangle', color: 'pink', x: 30, y: 60, rotation: 0 },
+            { id: 5, type: 'triangle', color: 'pink', x: 50, y: 60, rotation: 0 },
+            { id: 6, type: 'triangle', color: 'pink', x: 70, y: 60, rotation: 0 }
+        ]
+    },
+    {
+        title: "Core",
+        subtitle: "Center of gravity.",
+        shapes: [
+            { id: 1, type: 'hexagon', color: 'purple', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'yellow', x: 50, y: 50 },
+            { id: 3, type: 'diamond', color: 'cyan', x: 50, y: 20 },
+            { id: 4, type: 'diamond', color: 'cyan', x: 50, y: 80 },
+            { id: 5, type: 'diamond', color: 'cyan', x: 20, y: 50 },
+            { id: 6, type: 'diamond', color: 'cyan', x: 80, y: 50 }
+        ]
+    },
+    {
+        title: "Bloom",
+        subtitle: "Unfolding gracefully.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'pink', x: 50, y: 50 },
+            { id: 2, type: 'triangle', color: 'green', x: 50, y: 30, rotation: 0 },
+            { id: 3, type: 'triangle', color: 'green', x: 50, y: 70, rotation: 180 },
+            { id: 4, type: 'triangle', color: 'green', x: 30, y: 50, rotation: -90 },
+            { id: 5, type: 'triangle', color: 'green', x: 70, y: 50, rotation: 90 }
+        ]
+    },
+    {
+        title: "Gateway",
+        subtitle: "Passage to the unknown.",
+        shapes: [
+            { id: 1, type: 'square', color: 'blue', x: 20, y: 50 },
+            { id: 2, type: 'square', color: 'blue', x: 80, y: 50 },
+            { id: 3, type: 'circle', color: 'yellow', x: 50, y: 50 },
+            { id: 4, type: 'triangle', color: 'purple', x: 50, y: 20, rotation: 0 }
+        ]
+    },
+    {
+        title: "Drift",
+        subtitle: "Floating free.",
+        shapes: [
+            { id: 1, type: 'circle', color: 'cyan', x: 20, y: 30 },
+            { id: 2, type: 'circle', color: 'cyan', x: 40, y: 70 },
+            { id: 3, type: 'circle', color: 'cyan', x: 60, y: 20 },
+            { id: 4, type: 'circle', color: 'cyan', x: 80, y: 60 }
+        ]
+    },
+    {
+        title: "Anchor",
+        subtitle: "Hold fast.",
+        shapes: [
+            { id: 1, type: 'triangle', color: 'orange', x: 50, y: 70, rotation: 180 },
+            { id: 2, type: 'square', color: 'blue', x: 50, y: 40 },
+            { id: 3, type: 'circle', color: 'blue', x: 50, y: 20 }
+        ]
+    },
+    {
+        title: "Orbit II",
+        subtitle: "Gravity wells.",
+        shapes: [
+            { id: 1, type: 'hexagon', color: 'yellow', x: 50, y: 50 },
+            { id: 2, type: 'circle', color: 'purple', x: 20, y: 20 },
+            { id: 3, type: 'circle', color: 'purple', x: 80, y: 80 },
+            { id: 4, type: 'circle', color: 'purple', x: 20, y: 80 },
+            { id: 5, type: 'circle', color: 'purple', x: 80, y: 20 }
+        ]
+    },
+    {
+        title: "Silence",
+        subtitle: "The space between.",
+        shapes: [
+            { id: 1, type: 'square', color: 'blue', x: 25, y: 25 },
+            { id: 2, type: 'square', color: 'blue', x: 75, y: 25 },
+            { id: 3, type: 'square', color: 'blue', x: 25, y: 75 },
+            { id: 4, type: 'square', color: 'blue', x: 75, y: 75 },
+            { id: 5, type: 'diamond', color: 'pink', x: 50, y: 50 }
+        ]
     }
 ];
 
@@ -1250,7 +1361,34 @@ const QUOTES = [
     "One moment of patience may ward off great disaster.",
     "Purity and impurity depend on oneself; no one can purify another.",
     "Flow with whatever may happen, and let your mind be free.",
-    "Life is a series of natural and spontaneous changes."
+    "Life is a series of natural and spontaneous changes.",
+    "The only way out is through.",
+    "What you are looking for is what is looking.",
+    "Your vision will become clear only when you can look into your own heart.",
+    "Edit your life frequently and ruthlessly. It's your masterpiece.",
+    "Surrender to what is. Let go of what was. Have faith in what will be.",
+    "The quieter you become, the more you can hear.",
+    "Nothing ever goes away until it has taught us what we need to know.",
+    "Be happy for this moment. This moment is your life.",
+    "Happiness is not something ready made. It comes from your own actions.",
+    "Change is never painful, only the resistance to change is painful.",
+    "Tension is who you think you should be. Relaxation is who you are.",
+    "Every breath we take, every step we make, can be filled with peace, joy and serenity.",
+    "The soul always knows what to do to heal itself. The challenge is to silence the mind.",
+    "Look past your thoughts, so you may drink the pure nectar of This Moment.",
+    "Mindfulness is the key to the present moment.",
+    "To understand the immeasurable, the mind must be extraordinarily quiet, still.",
+    "Your potential is infinite.",
+    "Harmony is the essence of the universe.",
+    "Order is the shape of peace.",
+    "Let yourself be silently drawn by the strange pull of what you really love.",
+    "There is a voice that doesn't use words. Listen."
+];
+
+const FEEDBACK_WORDS = [
+    "Snap!", "Aligned", "Perfect", "Harmony", "Serene", "Flow",
+    "One", "Balance", "Clear", "Focus", "Pure", "Resonant",
+    "Connected", "Whole", "Still", "Unified"
 ];
 
 class SoundEngine {
@@ -1790,7 +1928,8 @@ class Game {
                 this.handleWin();
             } else {
                 this.sound.play('drop_success');
-                this.showFloatingFeedback(this.targetSnap.el, "Snap!");
+                const word = FEEDBACK_WORDS[Math.floor(Math.random() * FEEDBACK_WORDS.length)];
+                this.showFloatingFeedback(this.targetSnap.el, word);
             }
             if (navigator.vibrate) navigator.vibrate(20);
         } else {
@@ -1891,13 +2030,22 @@ class Game {
         const accuracy = Math.max(0, 100 - (this.mistakes * 15));
 
         // Dynamic praise based on performance
-        let phrase = "Beautiful";
-        if (accuracy === 100 && duration < 8) phrase = "Transcendent";
-        else if (accuracy === 100 && duration < 12) phrase = "Perfect Flow";
-        else if (accuracy === 100) phrase = "Sublime Focus";
-        else if (accuracy >= 90) phrase = "Ethereal";
-        else if (accuracy >= 80) phrase = "Geometric Harmony";
-        else phrase = "Mindful Progress";
+        let phrase = "Mindful Progress";
+        if (accuracy === 100) {
+            if (duration < 6) phrase = "Divine Velocity";
+            else if (duration < 10) phrase = "Transcendent";
+            else if (duration < 15) phrase = "Perfect Flow";
+            else if (duration < 20) phrase = "Pure Focus";
+            else phrase = "Sublime Alignment";
+        } else if (accuracy >= 95) {
+            phrase = "Ethereal Precision";
+        } else if (accuracy >= 90) {
+            phrase = "Geometric Harmony";
+        } else if (accuracy >= 80) {
+            phrase = "Beautiful Order";
+        } else if (accuracy >= 70) {
+            phrase = "Finding Balance";
+        }
 
         this.winTitle.textContent = phrase;
 
